@@ -1,0 +1,9 @@
+The file format of libpinyin
+
+Input file format
+1. Index Files
+   * raw corpus are classified into /index/<category>/<subsection>/<items>.index
+     * Every line consists of <item>#<item path name>
+2. Content Files
+   * The content file is stored in <item path name>, such as <number>.text.
+     * Note: please add a prefix to the <item path name>, so the content files are easier to organize.
