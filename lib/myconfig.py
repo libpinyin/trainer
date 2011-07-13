@@ -4,10 +4,27 @@ import os
 class MyConfig:
     ''' My Configuration '''
 
-    m_current_pass_epoch = 1
+    m_current_epoch = { 'SegmentEpoch': 1, \
+                            'GenerateEpoch': 2, \
+                            'EstimateEpoch': 3, \
+                            'PruneEpoch': 4, \
+                            'EvaluateEpoch': 5 \
+                        }
 
-    def getEpoch(self):
-        return m_current_pass_epoch
+    def getSegmentEpoch(self):
+        return m_current_epoch['SegmentEpoch']
+
+    def getGenerateEpoch(self):
+        return m_current_epoch['GenerateEpoch']
+
+    def getEstimateEpoch(self):
+        return m_current_epoch['EstimateEpoch']
+
+    def getPruneEpoch(self):
+        return m_current_epoch['PruneEpoch']
+
+    def getEvaluateEpoch(self):
+        return m_current_epoch['EvaluateEpoch']
 
     m_trainer_dir = '/media/data/Program/trainer'
 
@@ -21,10 +38,12 @@ class MyConfig:
         return m_trainer_dir + os.sep + 'models'
 
     def getFinalModelDir(self):
-        return m_trainer_dir + os.sep + 'final'
+        return m_trainer_dir + os.sep + 'finals'
 
     #about 1,200 Chinese characters
-    m_minimum_file_size = 5,000
+    m_minimum_chinese_characters = 1,200
+    m_minimum_file_size = m_minimum_chinese_characters * 3 + \
+        m_minimum_chinese_characters / 2
 
     def getMinimumFileSize(self):
         return m_minimum_file_size
