@@ -58,3 +58,18 @@ class MyConfig:
 
     def getStatusPostfix(self):
         return m_status_postfix
+
+    m_index_postfix = '.index'
+
+    def getIndexPostfix(self):
+        return m_index_postfix
+
+    m_text_postfix = '.text'
+
+    def getTextPostfix(self):
+        return m_text_postfix
+
+    m_final_model_file_name = 'interpolation.text'
+
+    def getFinalModelFileName(self):
+        return m_final_model_file_name
