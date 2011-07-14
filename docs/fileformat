@@ -1,9 +1,52 @@
-The file format of libpinyin
+The File Format of libpinyin
 
-Input file format
+Input File Format
 1. Index Files
    * raw corpus are classified into /index/<category>/<subsection>/<items>.index
      * Every line consists of <item>#<item path name>
 2. Content Files
    * The content file is stored in <item path name>, such as <number>.text.
      * Note: please add a prefix to the <item path name>, so the content files are easier to organize.
+
+Status File Format
+1. Introduction
+   As mentioned above, there are two kinds of input files:
+   1. Index Files will be called <items>.index;
+   2. Content Files will be called <number>.text.
+
+   The training process consists of 5 steps:
+       1. Segment Raw Corpus
+       2. Generate Models
+       3. Estimate Models
+       4. Prune Models
+       5. Evaluate Models
+
+2. Status Files
+   Segment Status Files
+       1. For <number>.text, <number>.text.status will be generated, like:
+          {'SegmentEpoch': 1}.
+       2. For <items>.index, <items>.index.status will be generated, like:
+          {'SegmentEpoch': 1}.
+   Generate Status Files
+       1. For <number>.text, if the <number>.text is qualified,
+          <number>.text.status will be generated, like:
+          {'GenerateEpoch': 2}.
+       2. For <items>.index, <items>.index.status will be generated, like:
+          {'GenerateEpoch': 2}.
+       3. The generated K Mixture Model files are placed in 'models':
+          1. The model files are placed in the same sub-directory as <items>.index;
+          2. Each model files are named as 'model-candidates-0.db' ,etc.
+   Estimate Status Files
+       1. For model-candidates-<num>.db, model-candidates-<num>.db.status are generated, like:
+          {'EstimateEpoch': 3, 'EstimateScore': 0.7}
+       2. The 'Estimate.index' file are generated, with content like:
+          <sub-directory>#model-candidates-<num>.db#<score>
+          The lines are sorted by <score>.
+   Prune Status Files
+       1. 'merged.db', 'pruned.db', 'kmm.text', 'interpolation.text' are generated when running prune tools in 'finals/try<num>' sub-directory.
+       2. 'prune.status' file are generated also, like:
+          {'PruneEpoch': 4, 'PruneMergeNumber': 1000,
+          'PruneK':2, 'PruneCDF': 0.6}
+   Evaluate Status Files
+       1. 'evaluate.status' file are generated, like:
+          {'EvaluateEpoch': 5, 'EvaluateCorrectionRate': 0.77}
