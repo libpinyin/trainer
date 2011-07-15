@@ -4,16 +4,10 @@ import os.path
 import sys
 from argparse import ArgumentParser
 from myconfig import MyConfig
+from utils import read_file
 
 
 config = MyConfig()
-
-
-def read_file(infile):
-    with open(infile, 'r') as f:
-        data = ''.join(f.readlines())
-    f.close()
-    return data
 
 
 def handleError(error):
