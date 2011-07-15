@@ -1,3 +1,4 @@
+import os
 import json
 
 #Utils
@@ -17,8 +18,18 @@ def write_file(outfile, data):
 
 #JSON Load/Store
 def load_status(infile):
-    return json.loads(read_file(infile))
+    data = '{}'
+    if os.access(infile, os.R_OK):
+        data = read_file(infile)
+
+    return json.loads(data)
 
 def store_status(outfile, obj):
     write_file(outfile, json.dumps(obj))
     return
+
+#test case
+if __name__ == '__main__':
+    obj = load_status('/tmp/test.status')
+    print(obj)
+    store_status('/tmp/test.status', obj)
