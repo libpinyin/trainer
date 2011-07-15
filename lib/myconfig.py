@@ -41,7 +41,7 @@ class MyConfig:
         return m_trainer_dir + os.sep + 'finals'
 
     #about 1,200 Chinese characters
-    m_minimum_chinese_characters = 1,200
+    m_minimum_chinese_characters = 1200
     m_minimum_file_size = m_minimum_chinese_characters * 3 + \
         m_minimum_chinese_characters / 2
 
@@ -62,7 +62,7 @@ class MyConfig:
     m_index_postfix = '.index'
 
     def getIndexPostfix(self):
-        return m_index_postfix
+        return self.m_index_postfix
 
     m_text_postfix = '.text'
 

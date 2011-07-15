@@ -2,6 +2,7 @@
 import os
 import os.path
 import sys
+from argparse import ArgumentParser
 from myconfig import MyConfig
 
 
@@ -45,6 +46,12 @@ def iterateSubDirectory(oldroot, newroot, level):
             iterateSubDirectory(olddir, newdir, level - 1)
 
 
-#test case
 if __name__ == '__main__':
-    pass
+    parser = ArgumentParser(description='Reduce the categories.')
+    parser.add_argument('--level', action='store', nargs=1, default=2)
+    parser.add_argument('origdir', action='store')
+    parser.add_argument('destdir', action='store')
+
+    args = parser.parse_args()
+    iterateSubDirectory(args.origdir, args.destdir, int(args.level[0]))
+    print('done')
