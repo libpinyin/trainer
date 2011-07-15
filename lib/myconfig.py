@@ -4,12 +4,12 @@ import os
 class MyConfig:
     ''' My Configuration '''
 
-    m_current_epoch = { 'SegmentEpoch': 1, \
-                            'GenerateEpoch': 2, \
-                            'EstimateEpoch': 3, \
-                            'PruneEpoch': 4, \
-                            'EvaluateEpoch': 5 \
-                        }
+    m_current_epoch = {'SegmentEpoch': 1, \
+                           'GenerateEpoch': 2, \
+                           'EstimateEpoch': 3, \
+                           'PruneEpoch': 4, \
+                           'EvaluateEpoch': 5 \
+                           }
 
     def getSegmentEpoch(self):
         return m_current_epoch['SegmentEpoch']
