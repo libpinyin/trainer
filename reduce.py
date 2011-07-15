@@ -47,9 +47,12 @@ def iterateSubDirectory(oldroot, newroot, level):
 
 if __name__ == '__main__':
     parser = ArgumentParser(description='Reduce the categories.')
-    parser.add_argument('--level', action='store', nargs=1, default=2)
-    parser.add_argument('origdir', action='store')
-    parser.add_argument('destdir', action='store')
+    parser.add_argument('--level', action='store', nargs=1, default=2, \
+                            help='reduce to n levels of index')
+    parser.add_argument('origdir', action='store', \
+                            help='original index directory')
+    parser.add_argument('destdir', action='store', \
+                            help='reduced index directory')
 
     args = parser.parse_args()
     iterateSubDirectory(args.origdir, args.destdir, int(args.level[0]))
