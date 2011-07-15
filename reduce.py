@@ -8,14 +8,17 @@ from myconfig import MyConfig
 
 config = MyConfig()
 
+
 def read_file(infile):
     with open(infile, 'r') as f:
         data = ''.join(f.readlines())
     f.close()
     return data
 
+
 def handleError(error):
     sys.exit(error)
+
 
 def mergeSubIndex(output, path):
     for root, dirs, files in os.walk(path, topdown=True, onerror=handleError):
@@ -26,11 +29,11 @@ def mergeSubIndex(output, path):
                 output.writelines([data])
             else:
                 print('Unexpected file:' + filepath)
-                
+
 
 def iterateSubDirectory(oldroot, newroot, level):
     #Merge the index in oldroot
-    if level <= 0 :
+    if level <= 0:
         newindex = newroot + config.getIndexPostfix()
         os.makedirs(os.path.dirname(newindex), exist_ok=True)
         newindexfile = open(newindex, 'a')
