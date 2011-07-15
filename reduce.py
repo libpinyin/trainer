@@ -23,7 +23,7 @@ def mergeSubIndex(output, path):
             filepath = os.path.join(root, onefile)
             if onefile.endswith(config.getIndexPostfix()):
                 data = read_file(filepath)
-                output.writelines([data, os.linesep])
+                output.writelines([data])
             else:
                 print('Unexpected file:' + filepath)
                 
@@ -36,10 +36,12 @@ def iterateSubDirectory(oldroot, newroot, level):
         newindexfile = open(newindex, 'a')
         mergeSubIndex(newindexfile, oldroot)
         newindexfile.close()
+        return
     #Recursive into the sub directories
     for onedir in os.listdir(oldroot):
         olddir = os.path.join(oldroot, onedir)
         newdir = os.path.join(newroot, onedir)
+
         if not os.path.isdir(olddir):
             sys.exit('Un-expected file:' + olddir)
         else:
