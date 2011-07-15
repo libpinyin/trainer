@@ -12,33 +12,33 @@ class MyConfig:
                            }
 
     def getSegmentEpoch(self):
-        return m_current_epoch['SegmentEpoch']
+        return self.m_current_epoch['SegmentEpoch']
 
     def getGenerateEpoch(self):
-        return m_current_epoch['GenerateEpoch']
+        return self.m_current_epoch['GenerateEpoch']
 
     def getEstimateEpoch(self):
-        return m_current_epoch['EstimateEpoch']
+        return self.m_current_epoch['EstimateEpoch']
 
     def getPruneEpoch(self):
-        return m_current_epoch['PruneEpoch']
+        return self.m_current_epoch['PruneEpoch']
 
     def getEvaluateEpoch(self):
-        return m_current_epoch['EvaluateEpoch']
+        return self.m_current_epoch['EvaluateEpoch']
 
     m_trainer_dir = '/media/data/Program/trainer'
 
     def getBaseDir(self):
-        return m_trainer_dir
+        return self.m_trainer_dir
 
     def getTextDir(self):
-        return m_trainer_dir + os.sep + 'texts'
+        return self.m_trainer_dir + os.sep + 'texts'
 
     def getModelDir(self):
-        return m_trainer_dir + os.sep + 'models'
+        return self.m_trainer_dir + os.sep + 'models'
 
     def getFinalModelDir(self):
-        return m_trainer_dir + os.sep + 'finals'
+        return self.m_trainer_dir + os.sep + 'finals'
 
     #about 1,200 Chinese characters
     m_minimum_chinese_characters = 1200
@@ -46,18 +46,18 @@ class MyConfig:
         m_minimum_chinese_characters / 2
 
     def getMinimumFileSize(self):
-        return m_minimum_file_size
+        return self.m_minimum_file_size
 
     m_segment_postfix = '.segmented'
 
     def getSegmentPostfix(self):
-        return m_segment_postfix
+        return self.m_segment_postfix
 
     #For both index page, item page and binary model file
     m_status_postfix = '.status'
 
     def getStatusPostfix(self):
-        return m_status_postfix
+        return self.m_status_postfix
 
     m_index_postfix = '.index'
 
@@ -67,9 +67,9 @@ class MyConfig:
     m_text_postfix = '.text'
 
     def getTextPostfix(self):
-        return m_text_postfix
+        return self.m_text_postfix
 
     m_final_model_file_name = 'interpolation.text'
 
     def getFinalModelFileName(self):
-        return m_final_model_file_name
+        return self.m_final_model_file_name
