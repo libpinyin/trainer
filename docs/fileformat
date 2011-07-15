@@ -35,7 +35,9 @@ Status File Format
           {'GenerateEpoch': 2}.
        3. The generated K Mixture Model files are placed in 'models':
           1. The model files are placed in the same sub-directory as <items>.index;
-          2. Each model files are named as 'model-candidates-0.db' ,etc.
+          2. Each model files are named as 'model-candidates-0.db', etc.
+          3. The status files are named as 'model-candidates-0.db.status', like:
+          {'GenerateEpoch': 2}
    Estimate Status Files
        1. For model-candidates-<num>.db, model-candidates-<num>.db.status are generated, like:
           {'EstimateEpoch': 3, 'EstimateScore': 0.7}
