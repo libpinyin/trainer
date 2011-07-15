@@ -11,20 +11,8 @@ class MyConfig:
                            'EvaluateEpoch': 5 \
                            }
 
-    def getSegmentEpoch(self):
-        return self.m_current_epoch['SegmentEpoch']
-
-    def getGenerateEpoch(self):
-        return self.m_current_epoch['GenerateEpoch']
-
-    def getEstimateEpoch(self):
-        return self.m_current_epoch['EstimateEpoch']
-
-    def getPruneEpoch(self):
-        return self.m_current_epoch['PruneEpoch']
-
-    def getEvaluateEpoch(self):
-        return self.m_current_epoch['EvaluateEpoch']
+    def getEpochs(self):
+        return self.m_current_epoch
 
     m_trainer_dir = '/media/data/Program/trainer'
 

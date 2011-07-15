@@ -28,6 +28,12 @@ def store_status(outfile, obj):
     write_file(outfile, json.dumps(obj))
     return
 
+def check_epoch(obj, passname):
+    pass
+
+def sign_epoch(obj, passname):
+    pass
+
 #test case
 if __name__ == '__main__':
     obj = load_status('/tmp/test.status')
