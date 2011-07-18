@@ -73,6 +73,8 @@ def walkThroughIndex(path):
             filepath = os.path.join(root, onefile)
             if onefile.endswith(config.getIndexPostfix()):
                 handleOneIndex(filepath)
+            elif onefile.endswith(config.getStatusPostfix()):
+                pass
             else:
                 print('Unexpected file:' + filepath)
 
