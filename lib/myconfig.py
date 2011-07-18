@@ -28,6 +28,16 @@ class MyConfig:
     def getFinalModelDir(self):
         return self.m_trainer_dir + os.sep + 'finals'
 
+    m_tools_dir = '/media/data/Program/trainer/tools'
+
+    def getToolsDir(self):
+        return self.m_tools_dir
+
+    m_evals_dir = '/media/data/Program/trainer/evals'
+
+    def getEvalsDir(self):
+        return self.m_evals_dir
+
     #about 1,200 Chinese characters
     m_minimum_chinese_characters = 1200
     m_minimum_file_size = m_minimum_chinese_characters * 3 + \
