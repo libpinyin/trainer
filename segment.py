@@ -25,13 +25,16 @@ def segmentOneText(infile, outfile, reportfile):
         return
 
     #begin processing
-    cmdline = './ngseg <"' + infile + '" 2>"' + reportfile + '"'
-    subprocess = Popen(cmdline, shell=True, stdout=PIPE, \
+    cmdline = './ngseg <"' + infile + '" >"' + outfile + '"'
+    subprocess = Popen(cmdline, shell=True, stderr=PIPE, \
                            close_fds=True)
 
-    with open(outfile, 'wb') as f:
-        f.writelines(subprocess.stdout.readlines())
-    f.close()
+    data = ''.join(subprocess.stderr.readlines())
+    if data:
+        print('found error report')
+        with open(reportfile, 'wb') as f:
+            f.writelines([data])
+        f.close()
 
     os.waitpid(subprocess.pid, 0)
     #end processing
@@ -61,7 +64,7 @@ def handleOneIndex(indexpath):
     indexfile.close()
     #end processing
 
-    utils.sign_epoch(indexstatus)
+    utils.sign_epoch(indexstatus, 'Segment')
     utils.store_status(indexstatuspath, indexstatus)
 
 def walkThroughIndex(path):

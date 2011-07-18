@@ -14,7 +14,7 @@ class EpochError(Exception):
 
 #Utils
 
-#File Load/Store
+#File Load/Store/Length
 def read_file(infile):
     with open(infile, 'r') as f:
         data = ''.join(f.readlines())
@@ -26,6 +26,13 @@ def write_file(outfile, data):
         f.writelines([data])
     f.close()
     return
+
+def get_file_length(infile):
+    f = open(infile, 'r')
+    f.seek(0, whence=io.SEEK_END)
+    length = f.tell()
+    f.close()
+    return length
 
 #JSON Load/Store
 def load_status(infile):
