@@ -29,11 +29,11 @@ def segmentOneText(infile, outfile, reportfile):
     subprocess = Popen(cmdline, shell=True, stderr=PIPE, \
                            close_fds=True)
 
-    data = ''.join(subprocess.stderr.readlines())
-    if data:
+    lines = subprocess.stderr.readlines()
+    if lines:
         print('found error report')
         with open(reportfile, 'wb') as f:
-            f.writelines([data])
+            f.writelines(lines)
         f.close()
 
     os.waitpid(subprocess.pid, 0)
