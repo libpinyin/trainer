@@ -1,5 +1,16 @@
 import os
 import json
+from myconfig import MyConfig
+
+
+config = MyConfig()
+
+#Exceptions
+class EpochError(Exception):
+    def __init__(self, value):
+        self.value = value
+    def __str__(self):
+        return repr(self.value)
 
 #Utils
 
@@ -29,10 +40,24 @@ def store_status(outfile, obj):
     return
 
 def check_epoch(obj, passname):
-    pass
+    epochname = passname + 'Epoch'
+    if not epochname in obj:
+        return False
+    object_epoch = int(obj[epochname])
+    config_epoch = int(config.getEpochs()[epochname])
+    if object_epoch > config_epoch:
+        raise EpochError('Un-excepted larger epoch en-countered.\n' + \
+                             'Please increace the epoch in myconfig.py\n' )
+
+    if object_epoch < config_epoch:
+        return False
+    if object_epoch == config_epoch:
+        return True
+    return None
 
 def sign_epoch(obj, passname):
-    pass
+    epochname = passname + 'Epoch'
+    obj[epochname] = config.getEpochs()[epochname]
 
 #test case
 if __name__ == '__main__':

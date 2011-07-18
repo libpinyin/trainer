@@ -3,6 +3,7 @@ import os
 import os.path
 from argparse import ArgumentParser
 from subprocess import Popen, PIPE
+import utils
 from myconfig import MyConfig
 
 
@@ -18,6 +19,12 @@ def handleError(error):
     sys.exit(error)
 
 def segmentOneText(infile, outfile, reportfile):
+    infilestatuspath = infile + config.getStatusPostfix()
+    infilestatus = utils.load_status(infilestatuspath)
+    if utils.check_epoch(infilestatus, 'Segment'):
+        return
+
+    #begin processing
     cmdline = './ngseg <"' + infile + '" 2>"' + reportfile + '"'
     subprocess = Popen(cmdline, shell=True, stdout=PIPE, \
                            close_fds=True)
@@ -27,8 +34,18 @@ def segmentOneText(infile, outfile, reportfile):
     f.close()
 
     os.waitpid(subprocess.pid, 0)
+    #end processing
+
+    utils.sign_epoch(infilestatus, 'Segment')
+    utils.store_status(infilestatuspath, infilestatus)
 
 def handleOneIndex(indexpath):
+    indexstatuspath = indexpath + config.getStatusPostfix()
+    indexstatus = utils.load_status(indexstatuspath)
+    if utils.check_epoch(indexstatus, 'Segment'):
+        return
+
+    #begin processing
     indexfile = open(indexpath, 'r')
     for oneline in indexfile.readlines():
         (title, textpath) = oneline.split('#')
@@ -42,6 +59,10 @@ def handleOneIndex(indexpath):
         segmentOneText(infile, outfile, reportfile)
         print("Processed "+ title + '#' + textpath)
     indexfile.close()
+    #end processing
+
+    utils.sign_epoch(indexstatus)
+    utils.store_status(indexstatuspath, indexstatus)
 
 def walkThroughIndex(path):
     for root, dirs, files in os.walk(path, topdown=True, onerror=handleError):
