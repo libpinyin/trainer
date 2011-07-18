@@ -28,12 +28,12 @@ class MyConfig:
     def getFinalModelDir(self):
         return self.m_trainer_dir + os.sep + 'finals'
 
-    m_tools_dir = '/media/data/Program/trainer/tools'
+    m_tools_dir = '/media/data/Program/trainer/tools/libpinyin'
 
     def getToolsDir(self):
         return self.m_tools_dir
 
-    m_evals_dir = '/media/data/Program/trainer/evals'
+    m_evals_dir = '/media/data/Program/trainer/evals/libpinyin'
 
     def getEvalsDir(self):
         return self.m_evals_dir
@@ -50,6 +50,11 @@ class MyConfig:
 
     def getSegmentPostfix(self):
         return self.m_segment_postfix
+
+    m_segment_report_postfix = '.segment.report'
+
+    def getSegmentReportPostfix(self):
+        return self.m_segment_report_postfix
 
     #For both index page, item page and binary model file
     m_status_postfix = '.status'
