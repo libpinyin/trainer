@@ -87,6 +87,7 @@ if __name__ == '__main__':
                             default=os.path.join(config.getTextDir(), 'index'))
 
     args = parser.parse_args()
+    print(args)
     walkThroughIndex(args.indexdir)
     print('done')
 
