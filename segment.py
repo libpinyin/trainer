@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 import os
 import os.path
+import sys
 from argparse import ArgumentParser
 from subprocess import Popen, PIPE
 import utils
@@ -81,8 +82,9 @@ def walkThroughIndex(path):
 
 if __name__ == '__main__':
     parser = ArgumentParser(description='Segment all raw corpus documents.')
-    parser.add_argument('indexdir', action='store', \
-                            help='index directory')
+    parser.add_argument('--indexdir', action='store', \
+                            help='index directory', \
+                            default=os.path.join(config.getTextDir(), 'index'))
 
     args = parser.parse_args()
     walkThroughIndex(args.indexdir)
