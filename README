@@ -1,0 +1,4 @@
+Libpinyin Trainer
+
+The libpinyin trainer is a sub project of libpinyin.
+These tools in libpinyin trainer prepare the final textual n-gram format for libpinyin usage.
