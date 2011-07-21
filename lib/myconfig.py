@@ -46,6 +46,17 @@ class MyConfig:
     def getMinimumFileSize(self):
         return self.m_minimum_file_size
 
+    m_candidate_model_size = 11.9 * 1024 * 1024
+
+    #the trained corpus size of model candidates
+    def getCandidateModelSize(self):
+        return self.m_candidate_model_size
+
+    m_candidate_model_name = "model-candidates-{0}.db"
+
+    def getCandidateModelName(self, index):
+        return self.m_candidate_model_name.format(index)
+        
     m_segment_postfix = '.segmented'
 
     def getSegmentPostfix(self):
