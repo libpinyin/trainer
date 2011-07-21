@@ -26,9 +26,14 @@ def segmentOneText(infile, outfile, reportfile):
         return
 
     #begin processing
-    cmdline = './ngseg <"' + infile + '" >"' + outfile + '"'
-    subprocess = Popen(cmdline, shell=True, stderr=PIPE, \
+    cmdline = './ngseg >"' + outfile + '"'
+    subprocess = Popen(cmdline, shell=True, stdin=PIPE, stderr=PIPE, \
                            close_fds=True)
+
+    with open(infile, 'rb') as f:
+        subprocess.stdin.writelines(f.readlines())
+    subprocess.stdin.close()
+    f.close()
 
     lines = subprocess.stderr.readlines()
     if lines:
