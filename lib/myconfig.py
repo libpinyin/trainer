@@ -38,24 +38,18 @@ class MyConfig:
     def getEvalsDir(self):
         return self.m_evals_dir
 
-    m_estimates_model = \
-        '/media/data/Program/trainer/tools/libpinyin/data/estimates.db'
+    m_estimates_model = m_tools_dir + '/data/estimates.db'
 
     def getEstimatesModel(self):
         return self.m_estimates_model
 
-    m_estimate_index = 'estimate.index'
-
     def getEstimateIndex(self):
-        return self.m_estimate_index
-
-    m_sorted_estimate_index = 'estimate.sorted.index'
+        return 'estimate.index'
 
     def getSortedEstimateIndex(self):
-        return self.m_sorted_estimate_index
+        return 'estimate.sorted.index'
 
-    m_evals_text = \
-        '/media/data/Program/trainer/tools/libpinyin/data/evals.text'
+    m_evals_text = m_tools_dir + '/data/evals.text'
 
     def getEvalsText(self):
         return self.m_evals_text
@@ -79,43 +73,27 @@ class MyConfig:
     def getCandidateModelName(self, index):
         return self.m_candidate_model_name.format(index)
 
-    m_maximum_occurs_allowed = 20
+    def getMaximumOccursAllowed(self):
+        return 20
 
-    def getMaximumOccurs(self):
-        return self.m_maximum_occurs_allowed
-
-    m_maximum_increase_rates_allowed = 3.
-
-    def getMaximumIncreaseRates(self):
-        return self.m_maximum_increase_rate_allowed
+    def getMaximumIncreaseRatesAllowed(self):
+        return 3.
         
-    m_segment_postfix = '.segmented'
-
     def getSegmentPostfix(self):
-        return self.m_segment_postfix
-
-    m_segment_report_postfix = '.segment.report'
+        return '.segmented'
 
     def getSegmentReportPostfix(self):
-        return self.m_segment_report_postfix
+        return '.segment.report'
 
     #For both index page, item page and binary model file
-    m_status_postfix = '.status'
-
     def getStatusPostfix(self):
-        return self.m_status_postfix
-
-    m_index_postfix = '.index'
+        return '.status'
 
     def getIndexPostfix(self):
-        return self.m_index_postfix
-
-    m_text_postfix = '.text'
+        return '.index'
 
     def getTextPostfix(self):
-        return self.m_text_postfix
-
-    m_final_model_file_name = 'interpolation.text'
+        return '.text'
 
     def getFinalModelFileName(self):
-        return self.m_final_model_file_name
+        return 'interpolation.text'

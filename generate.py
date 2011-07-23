@@ -31,9 +31,9 @@ def generateOneText(infile, modelfile, reportfile):
 
     #begin processing
     cmdline = ['./gen_k_mixture_model', '--maximum-occurs-allowed', \
-                   config.getMaximumOccurs(), \
+                   config.getMaximumOccursAllowed(), \
                    '--maximum-increase-rates-allowed', \
-                   config.getMaximumIncreaseRates(), \
+                   config.getMaximumIncreaseRatesAllowed(), \
                    '--k-mixture-model-file', \
                    modelfile, infile + \
                    config.getSegmentPostfix()]
