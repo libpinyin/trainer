@@ -44,6 +44,16 @@ class MyConfig:
     def getEstimatesModel(self):
         return self.m_estimates_model
 
+    m_estimate_index = 'estimate.index'
+
+    def getEstimateIndex(self):
+        return self.m_estimate_index
+
+    m_sorted_estimate_index = 'estimate.sorted.index'
+
+    def getSortedEstimateIndex(self):
+        return self.m_sorted_estimate_index
+
     m_evals_text = \
         '/media/data/Program/trainer/tools/libpinyin/data/evals.text'
 
