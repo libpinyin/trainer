@@ -20,13 +20,21 @@ def handleError(error):
 
 #Note: all file passed here should be trained.
 def generateOneText(infile, modelfile, reportfile):
+    infilestatuspath = infile + config.getStatusPostfix()
+    infilestatus = utils.load_status(infilestatuspath)
+    if not utils.check_epoch(infilestatus, 'Segment'):
+        raise utils.EpochError('Please segment first.\n')
+    if utils.check_epoch(infilestatus, 'Generate'):
+        return
+
     #begin processing
     cmdline = ['./gen_k_mixture_model', '--maximum-occurs-allowed', \
                    config.getMaximumOccurs(), \
                    '--maximum-increase-rates-allowed', \
                    config.getMaximumIncreaseRates(), \
                    '--k-mixture-model-file', \
-                   modelfile, infile]
+                   modelfile, infile + \
+                   config.getSegmentPostfix()]
     subprocess = Popen(cmdline, shell=False, stderr=PIPE, \
                            close_fds=True)
 
@@ -40,15 +48,34 @@ def generateOneText(infile, modelfile, reportfile):
     os.waitpid(subprocess.pid, 0);
     #end processing
 
+    utils.sign_epoch(infilestatus, 'Generate')
+    utils.store_status(infilestatuspath, infilestatus)
 
 #Note: should check the corpus file size, and skip the too small text file.
 def handleOneIndex(indexpath, subdir, indexname):
     print(indexpath, subdir, indexname)
 
+    indexstatuspath = indexpath + config.getStatusPostfix()
+    indexstatus = utils.load_status(indexstatuspath)
+    if not utils.check_epoch(indexstatus, 'Segment'):
+        raise utils.EpochError('Please segment first.\n')
+    if utils.check_epoch(indexstatus, 'Generate'):
+        return
+
+    #continue generating
     textnum, modelnum, aggmodelsize = 0, 0, 0
+    if 'GenerateTextEnd' in indexstatus:
+        textnum = indexstatus['GenerateTextEnd']
+    if 'GenerateModelEnd' in indexstatus:
+        modelnum = indexstatus['GenerateModelEnd']
+
     #begin processing
     indexfile = open(indexpath, 'r')
     for i, oneline in enumerate(indexfile.readlines()):
+        #continue last generating
+        if i < textnum:
+            continue
+
         #remove trailing '\n'
         oneline = oneline.rstrip(os.linesep)
         (title, textpath) = oneline.split('#')
@@ -67,6 +94,19 @@ def handleOneIndex(indexpath, subdir, indexname):
         generateOneText(infile, modelfile, reportfile)
         print("Processed " + title + '#' + textpath)
         if aggmodelsize > config.getCandidateModelSize():
+            nexttextnum = i + 1
+            #store model info in status file
+            modelstatuspath = modelfile + config.getStatusPostfix()
+            #create None status
+            modelstatus = {}
+            modelstatus['GenerateStart'] = textnum
+            modelstatus['GenerateEnd'] = nexttextnum
+            utils.sign_epoch(modelstatus, 'Generate')
+            utils.store_status(modelstatuspath, modelstatus)
+
+            #new model candidate
+            aggmodelsize = 0
+            textnum = nexttextnum
             modelnum++
             modeldir = os.path.join(config.getModelDir(), subdir, indexname)
             modelfile = os.path.join(modeldir, \
@@ -77,10 +117,15 @@ def handleOneIndex(indexpath, subdir, indexname):
             if os.access(reportfile, os.F_OK):
                 os.unlink(reportfile)
             #save current process in status file
+            indexstatus['GenerateTextEnd'] = nexttextnum
+            indexstatus['GenerateModelEnd'] = modelnum
+            utils.store_status(indexstatuspath, indexstatus)
             pass
     indexfile.close()
     #end processing
 
+    utils.sign_epoch(indexstatus, 'Generate')
+    utils.store_status(indexstatuspath, indexstatus)
 
 def walkThroughIndex(path):
     for root, dirs, files in os.walk(path, topdown=True, onerror=handleError):
@@ -97,4 +142,4 @@ def walkThroughIndex(path):
                 print('Unexpected file:' + filepath)
 
 if __name__ == '__main__':
-    pass
+    
