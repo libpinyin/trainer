@@ -2,6 +2,7 @@
 import os
 import os.path
 import subprocess
+from argparse import ArgumentParser
 import utils
 from myconfig import MyConfig
 
@@ -107,7 +108,7 @@ def handleOneIndex(indexpath, subdir, indexname):
             #new model candidate
             aggmodelsize = 0
             textnum = nexttextnum
-            modelnum++
+            modelnum += 1
             modeldir = os.path.join(config.getModelDir(), subdir, indexname)
             modelfile = os.path.join(modeldir, \
                                          config.getCandidateModelName(modelnum))
@@ -142,4 +143,12 @@ def walkThroughIndex(path):
                 print('Unexpected file:' + filepath)
 
 if __name__ == '__main__':
-    
+    parser = ArgumentParser(description='Generate model candidates.')
+    parser.add_argument('--indexdir', action='store', \
+                            help='index directory', \
+                            default=os.path.join(config.getTextDir(), 'index'))
+
+    args = parser.parse_args()
+    print(args)
+    walkThroughIndex(args.indexdir)
+    print('done')
