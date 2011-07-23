@@ -59,7 +59,10 @@ def walkThroughModels(path):
         for onefile in files:
             filepath = os.path.join(root, onefile)
             if onefile.endswith(config.getModelPostfix()):
+                subpath = os.path.relpath(filepath, path)
+                print("Processing " + subpath)
                 handleOneModel(filepath)
+                print("Processed " + subpath)
             elif onefile.endswith(config.getStatusPostfix()):
                 pass
             elif onefile.endswith(config.getIndexPostfix()):
@@ -134,4 +137,20 @@ def sortModels(indexname, sortedindexname):
     utils.store_status(sortedindexfilestatuspath, sortedindexfilestatus)
 
 if __name__ == '__main__':
-    pass
+    parser = ArgumentParser(description='Estimate model candidates.')
+    parser.add_argument('--modeldir', action='store', \
+                            help='model directory', \
+                            default=config.getModelDir())
+
+    args = parser.parse_args()
+    print(args)
+    print("estimating")
+    walkThroughModels(args.modeldir)
+    print("gathering")
+    indexname = os.path.join(args.modeldir, config.getEstimateIndex())
+    gatherModels(args.modeldir, indexname)
+    print("sorting")
+    sortedindexname = os.path.join(args.modeldir, \
+                                       config.getSortedEstimateIndex())
+    sortModels(indexname, sortedindexname)
+    print("done")
