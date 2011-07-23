@@ -4,6 +4,7 @@ import os.path
 import sys
 from subprocess import Popen, PIPE
 from argparse import ArgumentParser
+from operator import itemgetter
 import utils
 from myconfig import MyConfig
 
@@ -67,6 +68,12 @@ def walkThroughModels(path):
                 print('Unexpected file:' + filepath)
 
 def gatherModels(path, indexname):
+    indexfilestatuspath = indexname + config.getStatusPostfix()
+    indexfilestatus = utils.load_status(indexfilestatuspath)
+    if utils.check_epoch(indexfilestatuspath, 'Estimate'):
+        return
+
+    #begin processing
     indexfile = open(indexname, "w")
     for root, dirs, files in os.walk(path, topdown=True, onerror=handleError):
         for onefile in files:
@@ -91,9 +98,40 @@ def gatherModels(path, indexname):
             else:
                 print('Unexpected file:' + filepath)
     indexfile.close()
+    #end processing
 
-def sortModels(indexfilename, sortedindexfilename):
-    pass
+    utils.sign_epoch(indexfilestatus, 'Estimate')
+    utils.store_status(indexfilestatuspath, indexfilestatus)
+
+def sortModels(indexname, sortedindexname):
+    sortedindexfilestatuspath = sortedindexname + config.getStatusPostfix()
+    sortedindexfilestatus = utils.load_status(sortedindexfilestatuspath)
+    if utils.check_epoch(sortedindexfilestatus, 'Estimate'):
+        return        
+
+    #begin processing
+    records = []
+    indexfile = open(indexname, 'r')
+    for line in indexfile.readlines():
+        #remove the trailing '\n'
+        line = line.rstrip(os.linesep)
+        (subdir, modelname, score) = line.split('#', 2)
+        score = float(score)
+        records.append((subdir, modelname, score))
+    indexfile.close()
+
+    records.sort(key=itemgetter(2), reverse=True)
+
+    sortedindexfile = open(sortedindexname, 'w')
+    for record in records:
+        (subdir, modelname, score) = record
+        line = subdir + '#' + modelname + '#' + score
+        sortedindexfile.writelines([line])
+    sortedindexfile.close()
+    #end processing
+
+    utils.sign_epoch(sortedindexfilestatus, 'Estimate')
+    utils.store_status(sortedindexfilestatuspath, sortedindexfilestatus)
 
 if __name__ == '__main__':
     pass
