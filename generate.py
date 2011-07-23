@@ -2,7 +2,7 @@
 import os
 import os.path
 import sys
-import subprocess
+from subprocess import Popen, PIPE
 from argparse import ArgumentParser
 import utils
 from myconfig import MyConfig

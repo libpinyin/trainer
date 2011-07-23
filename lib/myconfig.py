@@ -65,6 +65,9 @@ class MyConfig:
         candidate_model_size = 11.9 * 1024 * 1024
         return candidate_model_size
 
+    def getModelPostfix(self):
+        return '.db'
+
     def getCandidateModelName(self, index):
         candidate_model_name = "model-candidates-{0}.db"
         return candidate_model_name.format(index)
