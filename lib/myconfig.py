@@ -38,6 +38,18 @@ class MyConfig:
     def getEvalsDir(self):
         return self.m_evals_dir
 
+    m_estimates_model = \
+        '/media/data/Program/trainer/tools/libpinyin/data/estimates.db'
+
+    def getEstimatesModel(self):
+        return self.m_estimates_model
+
+    m_evals_text = \
+        '/media/data/Program/trainer/tools/libpinyin/data/evals.text'
+
+    def getEvalsText(self):
+        return self.m_evals_text
+
     #about 1,200 Chinese characters
     m_minimum_chinese_characters = 1200
     m_minimum_file_size = m_minimum_chinese_characters * 3 + \

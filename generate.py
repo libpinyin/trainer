@@ -81,7 +81,7 @@ def handleOneIndex(indexpath, subdir, indexname):
         oneline = oneline.rstrip(os.linesep)
         (title, textpath) = oneline.split('#')
         infile = config.getTextDir() + textpath
-        infilesize = utils.get_file_length(infile)
+        infilesize = utils.get_file_length(infile + config.getSegmentPostfix())
         if infilesize < config.getMinimumFileSize():
             print("Skipping " + title + '#' + textpath)
             continue
@@ -117,7 +117,7 @@ def handleOneIndex(indexpath, subdir, indexname):
                 os.unlink(modelfile)
             if os.access(reportfile, os.F_OK):
                 os.unlink(reportfile)
-            #save current process in status file
+            #save current progress in status file
             indexstatus['GenerateTextEnd'] = nexttextnum
             indexstatus['GenerateModelEnd'] = modelnum
             utils.store_status(indexstatuspath, indexstatus)
