@@ -38,10 +38,9 @@ class MyConfig:
     def getEvalsDir(self):
         return self.m_evals_dir
 
-    m_estimates_model = m_tools_dir + '/data/estimates.db'
-
     def getEstimatesModel(self):
-        return self.m_estimates_model
+        estimates_model = m_tools_dir + '/data/estimates.db'
+        return estimates_model
 
     def getEstimateIndex(self):
         return 'estimate.index'
@@ -49,29 +48,26 @@ class MyConfig:
     def getSortedEstimateIndex(self):
         return 'estimate.sorted.index'
 
-    m_evals_text = m_tools_dir + '/data/evals.text'
-
     def getEvalsText(self):
-        return self.m_evals_text
-
-    #about 1,200 Chinese characters
-    m_minimum_chinese_characters = 1200
-    m_minimum_file_size = m_minimum_chinese_characters * 3 + \
-        m_minimum_chinese_characters / 2
+        evals_text = m_tools_dir + '/data/evals.text'
+        return evals_text
 
     def getMinimumFileSize(self):
-        return self.m_minimum_file_size
+        #about 1,200 Chinese characters
+        minimum_chinese_characters = 1200
+        minimum_file_size = minimum_chinese_characters * 3 + \
+            minimum_chinese_characters / 2
 
-    m_candidate_model_size = 11.9 * 1024 * 1024
+        return minimum_file_size
 
     #the trained corpus size of model candidates
     def getCandidateModelSize(self):
-        return self.m_candidate_model_size
-
-    m_candidate_model_name = "model-candidates-{0}.db"
+        candidate_model_size = 11.9 * 1024 * 1024
+        return candidate_model_size
 
     def getCandidateModelName(self, index):
-        return self.m_candidate_model_name.format(index)
+        candidate_model_name = "model-candidates-{0}.db"
+        return candidate_model_name.format(index)
 
     def getMaximumOccursAllowed(self):
         return 20
