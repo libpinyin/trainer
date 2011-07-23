@@ -56,6 +56,16 @@ class MyConfig:
 
     def getCandidateModelName(self, index):
         return self.m_candidate_model_name.format(index)
+
+    m_maximum_occurs_allowed = 20
+
+    def getMaximumOccurs(self):
+        return self.m_maximum_occurs_allowed
+
+    m_maximum_increase_rates_allowed = 3.
+
+    def getMaximumIncreaseRates(self):
+        return self.m_maximum_increase_rate_allowed
         
     m_segment_postfix = '.segmented'
 

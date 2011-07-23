@@ -32,7 +32,7 @@ Status File Format
           <number>.text.status will be generated, like:
           {'GenerateEpoch': 2}.
        2. For <items>.index, <items>.index.status will be generated, like:
-          {'GenerateEpoch': 2}.
+          {'GenerateEpoch': 2, 'GenerateIndexEnd':10, 'GenerateTextEnd':1000}.
        3. The generated K Mixture Model files are placed in 'models':
           1. The model files are placed in the same sub-directory as <items>.index;
           2. Each model files are named as 'model-candidates-0.db', etc.

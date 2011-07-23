@@ -57,9 +57,9 @@ def handleOneIndex(indexpath):
     #begin processing
     indexfile = open(indexpath, 'r')
     for oneline in indexfile.readlines():
-        (title, textpath) = oneline.split('#')
         #remove tailing '\n'
-        textpath = textpath.rstrip(os.linesep)
+        oneline = oneline.rstrip(os.linesep)
+        (title, textpath) = oneline.split('#')
         infile = config.getTextDir() + textpath
         outfile = config.getTextDir() + textpath + config.getSegmentPostfix()
         reportfile = config.getTextDir() + textpath + \
