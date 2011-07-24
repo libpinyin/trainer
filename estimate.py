@@ -39,7 +39,7 @@ def handleOneModel(modelfile):
                    modelfile]
 
     subprocess = Popen(cmdline, shell=False, stdout=PIPE, \
-                           close_fds= True)
+                           close_fds=True)
 
     for line in subprocess.stdout.readlines():
         #remove trailing '\n'
