@@ -47,6 +47,25 @@ def exportModel(modelfile, textmodel):
         sys.exit('Corrupted model found when exporting:' + modelfile)
     #end processing
 
+def convertModel(kmm_model, inter_model):
+    #begin processing
+    cmdline = ['./k_mixture_model_to_interpolation']
+
+    subprocess = Popen(cmdline, shell=False, stdin=PIPE, \
+                           stdout=PIPE, close_fds=True)
+    with open(kmm_model, 'rb') as f:
+        subprocess.stdin.writelines(f.readlines())
+    f.close()
+
+    with open(inter_model, 'wb') as f:
+        f.writelines(subprocess.stdout.readlines())
+    f.close()
+
+    (pid, status) = os.waitpid(subprocess.pid, 0)
+    if status != 0:
+        sys.exit('Corrupted model found when converting:' + kmm_model)
+    #end processing
+
 def mergeOneModel(mergedmodel, onemodel, score):
     #validate first
     validateModel(onemodel)
@@ -132,21 +151,32 @@ if __name__ == '__main__':
     print(args)
     tryname = 'try' + args.tryname
     #merge model candidates
+    print('merging')
     mergedmodel = os.path.join(config.getFinalDir(), tryname, 'merged.db')
     sortedindexname = os.path.join(args.modeldir, \
                                        config.getSortedEstimateIndex())
     mergeSomeModels(tryname, mergedmodel, sortedindexname, args.mergenumber)
 
     #export textual format
+    print('exporting')
     exportfile = os.path.join(config.getFinalDir(), tryname, 'kmm_merged.text')
     exportModel(mergedmodel, exportfile)
 
     #prune merged model
+    print('pruning')
     prunedmodel = os.path.join(config.getFinalDir(), tryname, 'pruned.db')
     #backup merged model
     shutil.copyfile(mergedmodel, prunedmodel)
     pruneModel(prunedmodel, args.k, args.CDF)
 
     #export textual format
+    print('exporting')
     exportfile = os.path.join(config.getFinalDir(), tryname, 'kmm_pruned.text')
-    exportModel(prunedmodel, exportModel)
+    exportModel(prunedmodel, exportfile)
+
+    #convert to interpolation
+    print('converting')
+    kmm_model = exportfile
+    inter_model = os.path.join(config.getFinalDir(), tryname, \
+                                   config.getFinalModelFileName())
+    convertModel(kmm_model, inter_model)
