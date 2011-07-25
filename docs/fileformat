@@ -46,9 +46,9 @@ Status File Format
           The lines are sorted by <score>.
    Prune Status Files
        1. 'merged.db', 'kmm_merged.text' , 'pruned.db', 'kmm_pruned.text', 'interpolation.text' are generated when running prune tools in 'finals/try<name>' sub-directory.
-       2. 'prune.status' file are generated also, like:
+       2. 'cwd.status' file are generated also, like:
           {'PruneEpoch': 4, 'PruneMergeNumber': 1000,
           'PruneK':2, 'PruneCDF': 0.6}
    Evaluate Status Files
-       1. 'evaluate.status' file are generated, like:
+       1. 'cwd.status' file are generated, like:
           {'EvaluateEpoch': 5, 'EvaluateAverageLambda': 0.66, 'EvaluateCorrectionRate': 0.77}

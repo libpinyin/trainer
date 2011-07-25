@@ -96,3 +96,6 @@ class MyConfig:
 
     def getFinalModelFileName(self):
         return 'interpolation.text'
+
+    def getFinalStatusFileName(self):
+        return 'cwd.status'

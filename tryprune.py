@@ -6,6 +6,7 @@ import sys
 from subprocess import Popen, PIPE
 from argparse import ArgumentParser
 from myconfig import MyConfig
+import utils
 
 
 config = MyConfig()
@@ -90,7 +91,7 @@ def mergeOneModel(mergedmodel, onemodel, score):
         sys.exit('Corrupted model found when merging:' + onemodel)
     #end processing
 
-def mergeSomeModels(tryname, mergedmodel, sortedindexname, mergenum):
+def mergeSomeModels(mergedmodel, sortedindexname, mergenum):
     last_score = 1.
     #begin processing
     indexfile = open(sortedindexname, 'r')
@@ -113,11 +114,11 @@ def mergeSomeModels(tryname, mergedmodel, sortedindexname, mergenum):
     #validate merged model
     validateModel(mergedmodel)
 
-def pruneModel(modelfile, k, CDF):
+def pruneModel(prunedmodel, k, CDF):
     #begin processing
     cmdline = ['./prune_k_mixture_model', \
                '-k', k, '--CDF', CDF,
-               modelfile]
+               prunedmodel]
 
     subprocess = Popen(cmdline, shell=False, close_fds=True)
     #check os.waitpid doc
@@ -125,6 +126,9 @@ def pruneModel(modelfile, k, CDF):
     if (status != 0):
         sys.exit('Corrupted model found when pruning:' + modelfile)
     #end processing
+
+    #validate pruned model
+    validateModel(prunedmodel)
 
 if __name__ == '__main__':
     parser = ArgumentParser(description='Try prune models.')
@@ -150,33 +154,51 @@ if __name__ == '__main__':
     args = parser.parse_args()
     print(args)
     tryname = 'try' + args.tryname
+
+    trydir = os.path.join(config.getFinalDir(), tryname)
+
+    #check try<name> directory
+    if os.access(trydir, os.F_OK):
+        sys.exit('try' + tryname + ' exists.')
+
+    os.makedirs(trydir)
+    cwdstatuspath = os.path.join(trydir, config.getFinalStatusFileName())
+    cwdstatus = {}
+    cwdstatus['PruneMergeNumber'] = args.mergenumber
+    cwdstatus['PruneK'] = args.k
+    cwdstatus['PruneCDF'] = args.CDF
+    utils.store_status(cwdstatuspath, cwdstatus)
+
     #merge model candidates
     print('merging')
-    mergedmodel = os.path.join(config.getFinalDir(), tryname, 'merged.db')
+    mergedmodel = os.path.join(trydir, 'merged.db')
     sortedindexname = os.path.join(args.modeldir, \
                                        config.getSortedEstimateIndex())
-    mergeSomeModels(tryname, mergedmodel, sortedindexname, args.mergenumber)
+    mergeSomeModels(mergedmodel, sortedindexname, args.mergenumber)
 
     #export textual format
     print('exporting')
-    exportfile = os.path.join(config.getFinalDir(), tryname, 'kmm_merged.text')
+    exportfile = os.path.join(trydir, 'kmm_merged.text')
     exportModel(mergedmodel, exportfile)
 
     #prune merged model
     print('pruning')
-    prunedmodel = os.path.join(config.getFinalDir(), tryname, 'pruned.db')
+    prunedmodel = os.path.join(trydir, 'pruned.db')
     #backup merged model
     shutil.copyfile(mergedmodel, prunedmodel)
     pruneModel(prunedmodel, args.k, args.CDF)
 
     #export textual format
     print('exporting')
-    exportfile = os.path.join(config.getFinalDir(), tryname, 'kmm_pruned.text')
+    exportfile = os.path.join(trydir, 'kmm_pruned.text')
     exportModel(prunedmodel, exportfile)
 
     #convert to interpolation
     print('converting')
     kmm_model = exportfile
-    inter_model = os.path.join(config.getFinalDir(), tryname, \
-                                   config.getFinalModelFileName())
+    inter_model = os.path.join(trydir, config.getFinalModelFileName())
     convertModel(kmm_model, inter_model)
+
+    #sign status epoch
+    utils.sign_epoch(cwdstatus, 'Prune')
+    utils.store_status(cwdstatuspath, cwdstatus)
