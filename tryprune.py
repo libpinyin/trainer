@@ -83,15 +83,15 @@ if __name__ == '__main__':
 
     parser.add_argument('--mergenumber', action='store', \
                             help='number of documents to be merged', \
-                            default='10')
+                            default=10, type=int)
 
     parser.add_argument('-k', action='store', \
                             help='k parameter of k mixture model prune', \
-                            default='3')
+                            default=3, type=int)
 
     parser.add_argument('--CDF', action='store', \
                             help='CDF parameter of k mixture model prune', \
-                            default='0.99')
+                            default=0.99, type=float)
 
     parser.add_argument('tryname', action='store', \
                             help='the storage directory')
