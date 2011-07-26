@@ -200,6 +200,8 @@ if __name__ == '__main__':
 
     modelsize = utils.get_file_length(inter_model)
     cwdstatus['PruneModelSize'] = modelsize
+    utils.store_status(cwdstatuspath, cwdstatus)
+
     print('final model size:' + modelsize)
 
     #sign status epoch
