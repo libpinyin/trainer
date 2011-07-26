@@ -198,6 +198,10 @@ if __name__ == '__main__':
     inter_model = os.path.join(trydir, config.getFinalModelFileName())
     convertModel(kmm_model, inter_model)
 
+    modelsize = utils.get_file_length(inter_model)
+    cwdstatus['PruneModelSize'] = modelsize
+    print('final model size:' + modelsize)
+
     #sign status epoch
     utils.sign_epoch(cwdstatus, 'Prune')
     utils.store_status(cwdstatuspath, cwdstatus)
