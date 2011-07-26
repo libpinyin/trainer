@@ -23,7 +23,7 @@ def validateModel(modelfile):
                    modelfile]
 
     subprocess = Popen(cmdline, shell=False, close_fds=True)
-    #check os.waitpid doc
+
     (pid, status) = os.waitpid(subprocess.pid, 0)
     if status != 0:
         sys.exit('Corrupted model found when validating:' + modelfile)
@@ -42,7 +42,6 @@ def exportModel(modelfile, textmodel):
         f.writelines(subprocess.stdout.readlines())
     f.close()
 
-    #check os.waitpid doc
     (pid, status) = os.waitpid(subprocess.pid, 0)
     if status != 0:
         sys.exit('Corrupted model found when exporting:' + modelfile)
@@ -85,7 +84,7 @@ def mergeOneModel(mergedmodel, onemodel, score):
                    onemodel]
 
     subprocess = Popen(cmdline, shell=False, close_fds=True)
-    #check os.waitpid doc
+
     (pid, status) = os.waitpid(subprocess.pid, 0)
     if status != 0:
         sys.exit('Corrupted model found when merging:' + onemodel)
@@ -103,7 +102,7 @@ def mergeSomeModels(mergedmodel, sortedindexname, mergenum):
         (subdir, modelname, score) = line.split('#', 2)
         score = float(score)
         if score > last_score:
-            raise AssertionError('score must be descending.\n')
+            raise AssertionError('scores must be descending.\n')
 
         onemodel = os.path.join(config.getModelDir(), subdir, modelname)
         mergeOneModel(mergedmodel, onemodel, score)
@@ -121,7 +120,7 @@ def pruneModel(prunedmodel, k, CDF):
                prunedmodel]
 
     subprocess = Popen(cmdline, shell=False, close_fds=True)
-    #check os.waitpid doc
+
     (pid, status) = os.waitpid(subprocess.pid, 0)
     if (status != 0):
         sys.exit('Corrupted model found when pruning:' + modelfile)
