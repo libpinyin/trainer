@@ -158,7 +158,7 @@ if __name__ == '__main__':
 
     #check try<name> directory
     if os.access(trydir, os.F_OK):
-        sys.exit('try' + tryname + ' exists.')
+        sys.exit(tryname + ' exists.')
 
     os.makedirs(trydir)
     cwdstatuspath = os.path.join(trydir, config.getFinalStatusFileName())
@@ -201,3 +201,4 @@ if __name__ == '__main__':
     #sign status epoch
     utils.sign_epoch(cwdstatus, 'Prune')
     utils.store_status(cwdstatuspath, cwdstatus)
+    print('done')

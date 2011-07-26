@@ -49,7 +49,7 @@ class MyConfig:
         return 'estimate.sorted.index'
 
     def getEvalsText(self):
-        evals_text = m_tools_dir + '/data/evals.text'
+        evals_text = m_evals_dir + '/data/evals.text'
         return evals_text
 
     def getMinimumFileSize(self):
