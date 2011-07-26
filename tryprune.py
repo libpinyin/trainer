@@ -17,6 +17,7 @@ libpinyin_sub_dir = os.path.join(libpinyin_dir, 'utils', 'training')
 os.chdir(libpinyin_sub_dir)
 #chdir done
 
+
 def validateModel(modelfile):
     #begin processing
     cmdline = ['./validate_k_mixture_model', \
@@ -28,6 +29,7 @@ def validateModel(modelfile):
     if status != 0:
         sys.exit('Corrupted model found when validating:' + modelfile)
     #end processing
+
 
 def exportModel(modelfile, textmodel):
     #begin processing
@@ -47,6 +49,7 @@ def exportModel(modelfile, textmodel):
         sys.exit('Corrupted model found when exporting:' + modelfile)
     #end processing
 
+
 def convertModel(kmm_model, inter_model):
     #begin processing
     cmdline = ['./k_mixture_model_to_interpolation']
@@ -65,6 +68,7 @@ def convertModel(kmm_model, inter_model):
     if status != 0:
         sys.exit('Corrupted model found when converting:' + kmm_model)
     #end processing
+
 
 def mergeOneModel(mergedmodel, onemodel, score):
     #validate first
@@ -90,6 +94,7 @@ def mergeOneModel(mergedmodel, onemodel, score):
         sys.exit('Corrupted model found when merging:' + onemodel)
     #end processing
 
+
 def mergeSomeModels(mergedmodel, sortedindexname, mergenum):
     last_score = 1.
     #begin processing
@@ -112,6 +117,7 @@ def mergeSomeModels(mergedmodel, sortedindexname, mergenum):
 
     #validate merged model
     validateModel(mergedmodel)
+
 
 def pruneModel(prunedmodel, k, CDF):
     #begin processing

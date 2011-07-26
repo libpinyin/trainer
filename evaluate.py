@@ -17,9 +17,10 @@ config = MyConfig()
 libpinyindir = config.getEvalsDir()
 os.chdir(libpinyindir)
 
-datafiles = [ 'gb_char.table',  'gbk_char.table', \
-                  config.getFinalModelFileName(), 'evals.text', \
-                  'deleted_bigram.db']
+datafiles = ['gb_char.table',  'gbk_char.table', \
+                 config.getFinalModelFileName(), 'evals.text', \
+                 'deleted_bigram.db']
+
 
 def checkData():
     cwd = os.getcwd()
@@ -28,6 +29,7 @@ def checkData():
         if not os.access(onefile, os.F_OK):
             sys.exit('missing one data file:' + onefile)
     os.chdir(cwd)
+
 
 def cleanUpData():
     #begin processing
@@ -38,6 +40,7 @@ def cleanUpData():
         sys.exit('make clean for data files failed.')
     #end processing
 
+
 def buildData():
     #begin processing
     cmdline = ['/usr/bin/make', '-f', 'Makefile.data', 'build']
@@ -46,6 +49,7 @@ def buildData():
     if status != 0:
         sys.exit('make build for data files failed.')
     #end processing
+
 
 def estimateModel():
     #change to utils/training subdir
@@ -73,6 +77,7 @@ def estimateModel():
     os.chdir(cwd)
     return avg_lambda
 
+
 def modifyCodeforLambda(lambdaparam):
     #begin processing
     cmdline = ['/usr/bin/make', '-f', 'Makefile.data', 'rebuild', \
@@ -82,6 +87,7 @@ def modifyCodeforLambda(lambdaparam):
     if status != 0:
         sys.exit('make rebuild for data files failed.')
     #end processing
+
 
 def evaluateModel():
     #change to utils/training subdir
@@ -159,7 +165,7 @@ if __name__ == '__main__':
 
     cwdstatus['EvaluateCorrectionRate'] = rate
     utils.store_status(cwdstatuspath, cwdstatus)
-    
-    utils.sign_epoch(cwdstatus, 'Evaluate');
+
+    utils.sign_epoch(cwdstatus, 'Evaluate')
     utils.store_status(cwdstatuspath, cwdstatus)
     print('done')

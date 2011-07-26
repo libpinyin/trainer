@@ -17,8 +17,10 @@ libpinyin_sub_dir = os.path.join(libpinyin_dir, 'utils', 'training')
 os.chdir(libpinyin_sub_dir)
 #chdir done
 
+
 def handleError(error):
     sys.exit(error)
+
 
 def handleOneModel(modelfile):
     modelfilestatuspath = modelfile + config.getStatusPostfix()
@@ -54,6 +56,7 @@ def handleOneModel(modelfile):
     utils.sign_epoch(modelfilestatus, 'Estimate')
     utils.store_status(modelfilestatuspath, modelfilestatus)
 
+
 def walkThroughModels(path):
     for root, dirs, files in os.walk(path, topdown=True, onerror=handleError):
         for onefile in files:
@@ -69,6 +72,7 @@ def walkThroughModels(path):
                 pass
             else:
                 print('Unexpected file:' + filepath)
+
 
 def gatherModels(path, indexname):
     indexfilestatuspath = indexname + config.getStatusPostfix()
@@ -106,11 +110,12 @@ def gatherModels(path, indexname):
     utils.sign_epoch(indexfilestatus, 'Estimate')
     utils.store_status(indexfilestatuspath, indexfilestatus)
 
+
 def sortModels(indexname, sortedindexname):
     sortedindexfilestatuspath = sortedindexname + config.getStatusPostfix()
     sortedindexfilestatus = utils.load_status(sortedindexfilestatuspath)
     if utils.check_epoch(sortedindexfilestatus, 'Estimate'):
-        return        
+        return
 
     #begin processing
     records = []

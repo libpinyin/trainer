@@ -16,8 +16,10 @@ libpinyin_sub_dir = os.path.join(libpinyin_dir, 'utils', 'segment')
 os.chdir(libpinyin_sub_dir)
 #chdir done
 
+
 def handleError(error):
     sys.exit(error)
+
 
 def segmentOneText(infile, outfile, reportfile):
     infilestatuspath = infile + config.getStatusPostfix()
@@ -48,6 +50,7 @@ def segmentOneText(infile, outfile, reportfile):
     utils.sign_epoch(infilestatus, 'Segment')
     utils.store_status(infilestatuspath, infilestatus)
 
+
 def handleOneIndex(indexpath):
     indexstatuspath = indexpath + config.getStatusPostfix()
     indexstatus = utils.load_status(indexstatuspath)
@@ -66,12 +69,13 @@ def handleOneIndex(indexpath):
             config.getSegmentReportPostfix()
         print("Processing " + title + '#' + textpath)
         segmentOneText(infile, outfile, reportfile)
-        print("Processed "+ title + '#' + textpath)
+        print("Processed " + title + '#' + textpath)
     indexfile.close()
     #end processing
 
     utils.sign_epoch(indexstatus, 'Segment')
     utils.store_status(indexstatuspath, indexstatus)
+
 
 def walkThroughIndex(path):
     for root, dirs, files in os.walk(path, topdown=True, onerror=handleError):
@@ -95,5 +99,3 @@ if __name__ == '__main__':
     print(args)
     walkThroughIndex(args.indexdir)
     print('done')
-
-

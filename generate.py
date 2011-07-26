@@ -16,6 +16,7 @@ libpinyin_sub_dir = os.path.join(libpinyin_dir, 'utils', 'training')
 os.chdir(libpinyin_sub_dir)
 #chdir done
 
+
 def handleError(error):
     sys.exit(error)
 
@@ -47,11 +48,12 @@ def generateOneText(infile, modelfile, reportfile):
             f.writelines(lines)
         f.close()
 
-    os.waitpid(subprocess.pid, 0);
+    os.waitpid(subprocess.pid, 0)
     #end processing
 
     utils.sign_epoch(infilestatus, 'Generate')
     utils.store_status(infilestatuspath, infilestatus)
+
 
 #Note: should check the corpus file size, and skip the too small text file.
 def handleOneIndex(indexpath, subdir, indexname):
@@ -111,8 +113,8 @@ def handleOneIndex(indexpath, subdir, indexname):
             textnum = nexttextnum
             modelnum += 1
             modeldir = os.path.join(config.getModelDir(), subdir, indexname)
-            modelfile = os.path.join(modeldir, \
-                                         config.getCandidateModelName(modelnum))
+            modelfile = os.path.join( \
+                modeldir, config.getCandidateModelName(modelnum))
             reportfile = modelfile + config.getReportPostfix()
             if os.access(modelfile, os.F_OK):
                 os.unlink(modelfile)
@@ -128,6 +130,7 @@ def handleOneIndex(indexpath, subdir, indexname):
 
     utils.sign_epoch(indexstatus, 'Generate')
     utils.store_status(indexstatuspath, indexstatus)
+
 
 def walkThroughIndex(path):
     for root, dirs, files in os.walk(path, topdown=True, onerror=handleError):
