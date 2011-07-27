@@ -138,8 +138,8 @@ if __name__ == '__main__':
                             help='model directory', \
                             default=config.getModelDir())
 
-    parser.add_argument('--mergenumber', action='store', \
-                            help='number of documents to be merged', \
+    parser.add_argument('--merge', action='store', \
+                            help='number of model candidates to be merged', \
                             default=10, type=int)
 
     parser.add_argument('-k', action='store', \
@@ -166,7 +166,7 @@ if __name__ == '__main__':
     os.makedirs(trydir)
     cwdstatuspath = os.path.join(trydir, config.getFinalStatusFileName())
     cwdstatus = {}
-    cwdstatus['PruneMergeNumber'] = args.mergenumber
+    cwdstatus['PruneMergeNumber'] = args.merge
     cwdstatus['PruneK'] = args.k
     cwdstatus['PruneCDF'] = args.CDF
     utils.store_status(cwdstatuspath, cwdstatus)
@@ -176,7 +176,7 @@ if __name__ == '__main__':
     mergedmodel = os.path.join(trydir, 'merged.db')
     sortedindexname = os.path.join(args.modeldir, \
                                        config.getSortedEstimateIndex())
-    mergeSomeModels(mergedmodel, sortedindexname, args.mergenumber)
+    mergeSomeModels(mergedmodel, sortedindexname, args.merge)
 
     #export textual format
     print('exporting')

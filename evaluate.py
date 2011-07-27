@@ -97,7 +97,7 @@ def modifyCodeforLambda(lambdaparam):
     #end processing
 
 
-def evaluateModel():
+def evaluateModel(reportfile):
     #change to utils/training subdir
     cwd = os.getcwd()
     os.chdir(os.path.join(libpinyindir, 'utils', 'training'))
@@ -106,9 +106,9 @@ def evaluateModel():
     rate = 0.
 
     #begin processing
-    cmdline = ['./eval_correction_rate']
+    cmdline = './eval_correction_rate 2>"' + reportfile + '"'
 
-    subprocess = Popen(cmdline, shell=False, stdout=PIPE, \
+    subprocess = Popen(cmdline, shell=True, stdout=PIPE, \
                            close_fds=True)
 
     for line in subprocess.stdout.readlines():
@@ -166,7 +166,7 @@ if __name__ == '__main__':
 
     print('estimating')
     reportfile = os.path.join \
-        (trydir, 'estimate_interpolation' + config.getReportPostfix())
+        (trydir, 'estimate' + config.getReportPostfix())
     avg_lambda = estimateModel(reportfile)
 
     cwdstatus['EvaluateAverageLambda'] = avg_lambda
@@ -176,7 +176,9 @@ if __name__ == '__main__':
     modifyCodeforLambda(avg_lambda)
 
     print('evaluating')
-    rate = evaluateModel()
+    reportfile = os.path.join \
+        (trydir, 'evaluate' + config.getReportPostfix())
+    rate = evaluateModel(reportfile)
     print(tryname + "'s correction rate:", rate)
 
     cwdstatus['EvaluateCorrectionRate'] = rate
