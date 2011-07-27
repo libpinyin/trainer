@@ -51,7 +51,7 @@ def buildData():
     #end processing
 
 
-def estimateModel():
+def estimateModel(reportfile):
     #change to utils/training subdir
     cwd = os.getcwd()
     os.chdir(os.path.join(libpinyindir, 'utils', 'training'))
@@ -65,13 +65,21 @@ def estimateModel():
     subprocess = Popen(cmdline, shell=False, stdout=PIPE, \
                            close_fds=True)
 
+    reporthandle = open(reportfile, 'wb')
+
     for line in subprocess.stdout.readlines():
+        reporthandle.writelines([line])
         #remove trailing '\n'
+        line = line.decode('utf-8')
         line = line.rstrip(os.linesep)
         if line.startswith(result_line_prefix):
             avg_lambda = float(line[len(result_line_prefix):])
 
-    os.waitpid(subprocess.pid, 0)
+    reporthandle.close()
+
+    (pid, status) = os.waitpid(subprocess.pid, 0)
+    if status != 0:
+        sys.exit('estimate interpolation model returns error.')
     #end processing
 
     os.chdir(cwd)
@@ -81,7 +89,7 @@ def estimateModel():
 def modifyCodeforLambda(lambdaparam):
     #begin processing
     cmdline = ['/usr/bin/make', '-f', 'Makefile.data', 'rebuild', \
-                   'LAMBDA_PARAMETER=' + lambdaparam]
+                   'LAMBDA_PARAMETER=' + str(lambdaparam)]
     subprocess = Popen(cmdline, shell=False, close_fds=True)
     (pid, status) = os.waitpid(subprocess.pid, 0)
     if status != 0:
@@ -105,6 +113,7 @@ def evaluateModel():
 
     for line in subprocess.stdout.readlines():
         #remove training '\n'
+        line = line.decode('utf-8')
         line = line.rstrip(os.linesep)
         if line.startswith(result_line_prefix):
             rate = float(line[len(result_line_prefix):])
@@ -145,24 +154,30 @@ if __name__ == '__main__':
     modelfile = os.path.join(trydir, config.getFinalModelFileName())
     destfile = os.path.join(libpinyindir, 'data', \
                                 config.getFinalModelFileName())
+
     print('copying from ' + modelfile + ' to ' + destfile)
     shutil.copyfile(modelfile, destfile)
 
     print('cleaning')
     cleanUpData()
+
     print('building')
     buildData()
+
     print('estimating')
-    avg_lambda = estimateModel()
+    reportfile = os.path.join \
+        (trydir, 'estimate_interpolation' + config.getReportPostfix())
+    avg_lambda = estimateModel(reportfile)
 
     cwdstatus['EvaluateAverageLambda'] = avg_lambda
     utils.store_status(cwdstatuspath, cwdstatus)
 
     print('rebuilding')
     modifyCodeforLambda(avg_lambda)
+
     print('evaluating')
     rate = evaluateModel()
-    print(tryname + "'s correction rate:" + rate)
+    print(tryname + "'s correction rate:", rate)
 
     cwdstatus['EvaluateCorrectionRate'] = rate
     utils.store_status(cwdstatuspath, cwdstatus)
