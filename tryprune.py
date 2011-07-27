@@ -52,13 +52,10 @@ def exportModel(modelfile, textmodel):
 
 def convertModel(kmm_model, inter_model):
     #begin processing
-    cmdline = ['./k_mixture_model_to_interpolation']
+    cmdline = './k_mixture_model_to_interpolation <"' + kmm_model + '"'
 
-    subprocess = Popen(cmdline, shell=False, stdin=PIPE, \
+    subprocess = Popen(cmdline, shell=True, \
                            stdout=PIPE, close_fds=True)
-    with open(kmm_model, 'rb') as f:
-        subprocess.stdin.writelines(f.readlines())
-    f.close()
 
     with open(inter_model, 'wb') as f:
         f.writelines(subprocess.stdout.readlines())
@@ -122,7 +119,7 @@ def mergeSomeModels(mergedmodel, sortedindexname, mergenum):
 def pruneModel(prunedmodel, k, CDF):
     #begin processing
     cmdline = ['./prune_k_mixture_model', \
-               '-k', k, '--CDF', CDF,
+               '-k', str(k), '--CDF', str(CDF),
                prunedmodel]
 
     subprocess = Popen(cmdline, shell=False, close_fds=True)
@@ -160,7 +157,7 @@ if __name__ == '__main__':
     print(args)
     tryname = 'try' + args.tryname
 
-    trydir = os.path.join(config.getFinalDir(), tryname)
+    trydir = os.path.join(config.getFinalModelDir(), tryname)
 
     #check try<name> directory
     if os.access(trydir, os.F_OK):
@@ -208,7 +205,7 @@ if __name__ == '__main__':
     cwdstatus['PruneModelSize'] = modelsize
     utils.store_status(cwdstatuspath, cwdstatus)
 
-    print('final model size:' + modelsize)
+    print('final model size:', modelsize)
 
     #sign status epoch
     utils.sign_epoch(cwdstatus, 'Prune')

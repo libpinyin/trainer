@@ -139,14 +139,15 @@ if __name__ == '__main__':
     if utils.check_epoch(cwdstatus, 'Evaluate'):
         sys.exit('already evaluated.')
 
+    print('checking')
+    checkData()
+
     modelfile = os.path.join(trydir, config.getFinalModelFileName())
     destfile = os.path.join(libpinyindir, 'data', \
                                 config.getFinalModelFileName())
     print('copying from ' + modelfile + ' to ' + destfile)
     shutil.copyfile(modelfile, destfile)
 
-    print('checking')
-    checkData()
     print('cleaning')
     cleanUpData()
     print('building')
