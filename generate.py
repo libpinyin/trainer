@@ -28,7 +28,7 @@ def generateOneText(infile, modelfile, reportfile):
     if not utils.check_epoch(infilestatus, 'Segment'):
         raise utils.EpochError('Please segment first.\n')
     if utils.check_epoch(infilestatus, 'Generate'):
-        return
+        return False
 
     #begin processing
     cmdline = ['./gen_k_mixture_model', '--maximum-occurs-allowed', \
@@ -55,6 +55,7 @@ def generateOneText(infile, modelfile, reportfile):
 
     utils.sign_epoch(infilestatus, 'Generate')
     utils.store_status(infilestatuspath, infilestatus)
+    return True
 
 
 #Note: should check the corpus file size, and skip the too small text file.
@@ -77,7 +78,7 @@ def handleOneIndex(indexpath, subdir, indexname):
         modelstatus['GenerateStart'] = textnum
         modelstatus['GenerateEnd'] = nexttextnum
         utils.sign_epoch(modelstatus, 'Generate')
-        utils.store_status(modelstatuspath, modelstatus)        
+        utils.store_status(modelstatuspath, modelstatus)
 
     print(indexpath, subdir, indexname)
 
@@ -114,14 +115,14 @@ def handleOneIndex(indexpath, subdir, indexname):
             print("Skipping " + title + '#' + textpath)
             continue
 
-        aggmodelsize += infilesize
         modeldir = os.path.join(config.getModelDir(), subdir, indexname)
         os.makedirs(modeldir, exist_ok=True)
         modelfile = os.path.join(modeldir, \
                                  config.getCandidateModelName(modelnum))
         reportfile = modelfile + config.getReportPostfix()
         print("Proccessing " + title + '#' + textpath)
-        generateOneText(infile, modelfile, reportfile)
+        if generateOneText(infile, modelfile, reportfile):
+            aggmodelsize += infilesize
         print("Processed " + title + '#' + textpath)
         if aggmodelsize > config.getCandidateModelSize():
             nexttextnum = i + 1
