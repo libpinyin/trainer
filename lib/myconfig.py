@@ -39,7 +39,7 @@ class MyConfig:
         return self.m_evals_dir
 
     def getEstimatesModel(self):
-        estimates_model = m_tools_dir + '/data/estimates.db'
+        estimates_model = self.m_tools_dir + '/data/estimates.db'
         return estimates_model
 
     def getEstimateIndex(self):
@@ -62,7 +62,7 @@ class MyConfig:
 
     #the trained corpus size of model candidates
     def getCandidateModelSize(self):
-        candidate_model_size = 11.9 * 1024 * 1024
+        candidate_model_size = 11.9 * 1024 * 1024 * 3
         return candidate_model_size
 
     def getModelPostfix(self):

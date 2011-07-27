@@ -148,6 +148,7 @@ def handleOneIndex(indexpath, subdir, indexname):
     #end processing
 
     #save current progress in status file
+    modelnum += 1
     indexstatus['GenerateTextEnd'] = nexttextnum
     indexstatus['GenerateModelEnd'] = modelnum
 

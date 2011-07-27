@@ -22,13 +22,15 @@ def handleError(error):
     sys.exit(error)
 
 
-def handleOneModel(modelfile):
+def handleOneModel(modelfile, reportfile):
     modelfilestatuspath = modelfile + config.getStatusPostfix()
     modelfilestatus = utils.load_status(modelfilestatuspath)
     if not utils.check_epoch(modelfilestatus, 'Generate'):
         raise utils.EpochError('Please generate first.\n')
     if utils.check_epoch(modelfilestatus, 'Estimate'):
         return
+
+    reporthandle = open(reportfile, 'wb')
 
     result_line_prefix = "average lambda:"
     avg_lambda = 0.
@@ -44,14 +46,21 @@ def handleOneModel(modelfile):
                            close_fds=True)
 
     for line in subprocess.stdout.readlines():
+        reporthandle.writelines([line])
         #remove trailing '\n'
+        line = line.decode('utf-8')
         line = line.rstrip(os.linesep)
         if line.startswith(result_line_prefix):
             avg_lambda = float(line[len(result_line_prefix):])
 
-    os.waitpid(subprocess.pid, 0)
+    reporthandle.close()
+
+    (pid, status) = os.waitpid(subprocess.pid, 0)
+    if status != 0:
+        sys.exit('estimate k mixture model returns error.')
     #end processing
 
+    print('average lambda:', avg_lambda)
     modelfilestatus['EstimateScore'] = avg_lambda
     utils.sign_epoch(modelfilestatus, 'Estimate')
     utils.store_status(modelfilestatuspath, modelfilestatus)
@@ -63,12 +72,15 @@ def walkThroughModels(path):
             filepath = os.path.join(root, onefile)
             if onefile.endswith(config.getModelPostfix()):
                 subpath = os.path.relpath(filepath, path)
+                reportfile = filepath + config.getReportPostfix()
                 print("Processing " + subpath)
-                handleOneModel(filepath)
+                handleOneModel(filepath, reportfile)
                 print("Processed " + subpath)
             elif onefile.endswith(config.getStatusPostfix()):
                 pass
             elif onefile.endswith(config.getIndexPostfix()):
+                pass
+            elif onefile.endswith(config.getReportPostfix()):
                 pass
             else:
                 print('Unexpected file:' + filepath)
@@ -101,6 +113,8 @@ def gatherModels(path, indexname):
             elif onefile.endswith(config.getStatusPostfix()):
                 pass
             elif onefile.endswith(config.getIndexPostfix()):
+                pass
+            elif onefile.endswith(config.getReportPostfix()):
                 pass
             else:
                 print('Unexpected file:' + filepath)
