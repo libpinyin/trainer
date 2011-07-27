@@ -48,7 +48,9 @@ def generateOneText(infile, modelfile, reportfile):
             f.writelines(lines)
         f.close()
 
-    os.waitpid(subprocess.pid, 0)
+    (pid, status) = os.waitpid(subprocess.pid, 0)
+    if status != 0:
+        sys.exit('gen_k_mixture_model encounters error.')
     #end processing
 
     utils.sign_epoch(infilestatus, 'Generate')
