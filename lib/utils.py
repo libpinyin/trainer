@@ -1,3 +1,4 @@
+import io
 import os
 import json
 from myconfig import MyConfig
@@ -34,7 +35,7 @@ def write_file(outfile, data):
 
 def get_file_length(infile):
     f = open(infile, 'r')
-    f.seek(0, whence=io.SEEK_END)
+    f.seek(0, io.SEEK_END)
     length = f.tell()
     f.close()
     return length

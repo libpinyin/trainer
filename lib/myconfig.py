@@ -78,6 +78,9 @@ class MyConfig:
     def getMaximumIncreaseRatesAllowed(self):
         return 3.
 
+    def getReportPostfix(self):
+        return '.report'
+
     def getSegmentPostfix(self):
         return '.segmented'
 

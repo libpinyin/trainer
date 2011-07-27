@@ -32,9 +32,9 @@ def generateOneText(infile, modelfile, reportfile):
 
     #begin processing
     cmdline = ['./gen_k_mixture_model', '--maximum-occurs-allowed', \
-                   config.getMaximumOccursAllowed(), \
+                   str(config.getMaximumOccursAllowed()), \
                    '--maximum-increase-rates-allowed', \
-                   config.getMaximumIncreaseRatesAllowed(), \
+                   str(config.getMaximumIncreaseRatesAllowed()), \
                    '--k-mixture-model-file', \
                    modelfile, infile + \
                    config.getSegmentPostfix()]
@@ -72,6 +72,16 @@ def handleOneIndex(indexpath, subdir, indexname):
         textnum = indexstatus['GenerateTextEnd']
     if 'GenerateModelEnd' in indexstatus:
         modelnum = indexstatus['GenerateModelEnd']
+
+    #clean up previous file
+    modeldir = os.path.join(config.getModelDir(), subdir, indexname)
+    modelfile = os.path.join( \
+        modeldir, config.getCandidateModelName(modelnum))
+    reportfile = modelfile + config.getReportPostfix()
+    if os.access(modelfile, os.F_OK):
+        os.unlink(modelfile)
+    if os.access(reportfile, os.F_OK):
+        os.unlink(reportfile)
 
     #begin processing
     indexfile = open(indexpath, 'r')
@@ -112,14 +122,7 @@ def handleOneIndex(indexpath, subdir, indexname):
             aggmodelsize = 0
             textnum = nexttextnum
             modelnum += 1
-            modeldir = os.path.join(config.getModelDir(), subdir, indexname)
-            modelfile = os.path.join( \
-                modeldir, config.getCandidateModelName(modelnum))
-            reportfile = modelfile + config.getReportPostfix()
-            if os.access(modelfile, os.F_OK):
-                os.unlink(modelfile)
-            if os.access(reportfile, os.F_OK):
-                os.unlink(reportfile)
+
             #save current progress in status file
             indexstatus['GenerateTextEnd'] = nexttextnum
             indexstatus['GenerateModelEnd'] = modelnum
