@@ -107,8 +107,8 @@ def gatherModels(path, indexname):
                     raise utils.EpochError('Unknown Error:\n' + \
                                                'Try re-run estimate.\n')
                 avg_lambda = status['EstimateScore']
-                line = subdir + '#' + onefile + '#' + avg_lambda
-                indexfile.writelines([line])
+                line = subdir + '#' + onefile + '#' + str(avg_lambda)
+                indexfile.writelines([line, os.linesep])
                 #record written
             elif onefile.endswith(config.getStatusPostfix()):
                 pass
@@ -147,8 +147,8 @@ def sortModels(indexname, sortedindexname):
     sortedindexfile = open(sortedindexname, 'w')
     for record in records:
         (subdir, modelname, score) = record
-        line = subdir + '#' + modelname + '#' + score
-        sortedindexfile.writelines([line])
+        line = subdir + '#' + modelname + '#' + str(score)
+        sortedindexfile.writelines([line, os.linesep])
     sortedindexfile.close()
     #end processing
 
