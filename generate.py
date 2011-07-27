@@ -59,6 +59,26 @@ def generateOneText(infile, modelfile, reportfile):
 
 #Note: should check the corpus file size, and skip the too small text file.
 def handleOneIndex(indexpath, subdir, indexname):
+    def cleanupFiles(modelnum):
+        modeldir = os.path.join(config.getModelDir(), subdir, indexname)
+        modelfile = os.path.join( \
+            modeldir, config.getCandidateModelName(modelnum))
+        reportfile = modelfile + config.getReportPostfix()
+        if os.access(modelfile, os.F_OK):
+            os.unlink(modelfile)
+        if os.access(reportfile, os.F_OK):
+            os.unlink(reportfile)
+
+    def storeModelStatus(modelfile, textnum, nexttextnum):
+        #store model info in status file
+        modelstatuspath = modelfile + config.getStatusPostfix()
+        #create None status
+        modelstatus = {}
+        modelstatus['GenerateStart'] = textnum
+        modelstatus['GenerateEnd'] = nexttextnum
+        utils.sign_epoch(modelstatus, 'Generate')
+        utils.store_status(modelstatuspath, modelstatus)        
+
     print(indexpath, subdir, indexname)
 
     indexstatuspath = indexpath + config.getStatusPostfix()
@@ -76,14 +96,7 @@ def handleOneIndex(indexpath, subdir, indexname):
         modelnum = indexstatus['GenerateModelEnd']
 
     #clean up previous file
-    modeldir = os.path.join(config.getModelDir(), subdir, indexname)
-    modelfile = os.path.join( \
-        modeldir, config.getCandidateModelName(modelnum))
-    reportfile = modelfile + config.getReportPostfix()
-    if os.access(modelfile, os.F_OK):
-        os.unlink(modelfile)
-    if os.access(reportfile, os.F_OK):
-        os.unlink(reportfile)
+    cleanupFiles(modelnum)
 
     #begin processing
     indexfile = open(indexpath, 'r')
@@ -100,6 +113,7 @@ def handleOneIndex(indexpath, subdir, indexname):
         if infilesize < config.getMinimumFileSize():
             print("Skipping " + title + '#' + textpath)
             continue
+
         aggmodelsize += infilesize
         modeldir = os.path.join(config.getModelDir(), subdir, indexname)
         os.makedirs(modeldir, exist_ok=True)
@@ -111,27 +125,30 @@ def handleOneIndex(indexpath, subdir, indexname):
         print("Processed " + title + '#' + textpath)
         if aggmodelsize > config.getCandidateModelSize():
             nexttextnum = i + 1
-            #store model info in status file
-            modelstatuspath = modelfile + config.getStatusPostfix()
-            #create None status
-            modelstatus = {}
-            modelstatus['GenerateStart'] = textnum
-            modelstatus['GenerateEnd'] = nexttextnum
-            utils.sign_epoch(modelstatus, 'Generate')
-            utils.store_status(modelstatuspath, modelstatus)
+            storeModelStatus(modelfile, textnum, nexttextnum)
 
             #new model candidate
             aggmodelsize = 0
             textnum = nexttextnum
             modelnum += 1
 
+            #clean up next file
+            cleanupFiles(modelnum)
+
             #save current progress in status file
             indexstatus['GenerateTextEnd'] = nexttextnum
             indexstatus['GenerateModelEnd'] = modelnum
             utils.store_status(indexstatuspath, indexstatus)
-            pass
+
+    nexttextnum = i + 1
+    storeModelStatus(modelfile, textnum, nexttextnum)
+
     indexfile.close()
     #end processing
+
+    #save current progress in status file
+    indexstatus['GenerateTextEnd'] = nexttextnum
+    indexstatus['GenerateModelEnd'] = modelnum
 
     utils.sign_epoch(indexstatus, 'Generate')
     utils.store_status(indexstatuspath, indexstatus)
