@@ -165,8 +165,7 @@ if __name__ == '__main__':
     buildData()
 
     print('estimating')
-    reportfile = os.path.join \
-        (trydir, 'estimate' + config.getReportPostfix())
+    reportfile = os.path.join(trydir, 'estimate' + config.getReportPostfix())
     avg_lambda = estimateModel(reportfile)
 
     cwdstatus['EvaluateAverageLambda'] = avg_lambda
@@ -176,8 +175,7 @@ if __name__ == '__main__':
     modifyCodeforLambda(avg_lambda)
 
     print('evaluating')
-    reportfile = os.path.join \
-        (trydir, 'evaluate' + config.getReportPostfix())
+    reportfile = os.path.join(trydir, 'evaluate' + config.getReportPostfix())
     rate = evaluateModel(reportfile)
     print(tryname + "'s correction rate:", rate)
 

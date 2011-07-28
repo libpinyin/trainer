@@ -68,8 +68,6 @@ def convertModel(kmm_model, inter_model):
 
 
 def mergeOneModel(mergedmodel, onemodel, score):
-    #validate first
-    validateModel(onemodel)
 
     onemodelstatuspath = onemodel + config.getStatusPostfix()
     onemodelstatus = utils.load_status(onemodelstatuspath)
@@ -107,13 +105,15 @@ def mergeSomeModels(mergedmodel, sortedindexname, mergenum):
             raise AssertionError('scores must be descending.\n')
 
         onemodel = os.path.join(config.getModelDir(), subdir, modelname)
+
+        #validate first
+        print('validating')
+        validateModel(onemodel)
+
         mergeOneModel(mergedmodel, onemodel, score)
         last_score = score
     indexfile.close()
     #end processing
-
-    #validate merged model
-    validateModel(mergedmodel)
 
 
 def pruneModel(prunedmodel, k, CDF):
@@ -129,8 +129,6 @@ def pruneModel(prunedmodel, k, CDF):
         sys.exit('Corrupted model found when pruning:' + modelfile)
     #end processing
 
-    #validate pruned model
-    validateModel(prunedmodel)
 
 if __name__ == '__main__':
     parser = ArgumentParser(description='Try prune models.')
@@ -178,6 +176,10 @@ if __name__ == '__main__':
                                        config.getSortedEstimateIndex())
     mergeSomeModels(mergedmodel, sortedindexname, args.merge)
 
+    #validate merged model
+    print('validating')
+    validateModel(mergedmodel)
+
     #export textual format
     print('exporting')
     exportfile = os.path.join(trydir, 'kmm_merged.text')
@@ -189,6 +191,10 @@ if __name__ == '__main__':
     #backup merged model
     shutil.copyfile(mergedmodel, prunedmodel)
     pruneModel(prunedmodel, args.k, args.CDF)
+
+    #validate pruned model
+    print('validating')
+    validateModel(prunedmodel)
 
     #export textual format
     print('exporting')
