@@ -167,6 +167,7 @@ if __name__ == '__main__':
     print('estimating')
     reportfile = os.path.join(trydir, 'estimate' + config.getReportPostfix())
     avg_lambda = estimateModel(reportfile)
+    print('average lambda:', avg_lambda)
 
     cwdstatus['EvaluateAverageLambda'] = avg_lambda
     utils.store_status(cwdstatuspath, cwdstatus)
