@@ -148,11 +148,16 @@ if __name__ == '__main__':
                             help='CDF parameter of k mixture model prune', \
                             default=0.99, type=float)
 
+    parser.add_argument('--fast', action='store_const', \
+                            help='Use in-memory filesystem to speed up prune',\
+                            const=True, default=False)
+
     parser.add_argument('tryname', action='store', \
                             help='the storage directory')
 
     args = parser.parse_args()
     print(args)
+
     tryname = 'try' + args.tryname
 
     trydir = os.path.join(config.getFinalModelDir(), tryname)
@@ -187,10 +192,21 @@ if __name__ == '__main__':
 
     #prune merged model
     print('pruning')
+
     prunedmodel = os.path.join(trydir, 'pruned.db')
-    #backup merged model
-    shutil.copyfile(mergedmodel, prunedmodel)
-    pruneModel(prunedmodel, args.k, args.CDF)
+    if args.fast:
+        shmmodel = os.path.join(config.getInMemoryFileSystem(), 'pruned.db')
+        if os.access(shmmodel, os.F_OK):
+            os.unlink(shmmodel)
+        #copy to memory
+        shutil.copyfile(mergedmodel, shmmodel)
+        pruneModel(shmmodel, args.k, args.CDF)
+        #copy to filesystem
+        shutil.copyfile(shmmodel, prunedmodel)
+    else:
+        #backup merged model
+        shutil.copyfile(mergedmodel, prunedmodel)
+        pruneModel(prunedmodel, args.k, args.CDF)
 
     #validate pruned model
     print('validating')

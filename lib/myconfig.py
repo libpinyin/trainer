@@ -48,6 +48,9 @@ class MyConfig:
     def getSortedEstimateIndex(self):
         return 'estimate.sorted.index'
 
+    def getInMemoryFileSystem(self):
+        return '/dev/shm'
+
     def getEvalsText(self):
         evals_text = m_evals_dir + '/data/evals.text'
         return evals_text
