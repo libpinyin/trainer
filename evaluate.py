@@ -13,9 +13,11 @@ from myconfig import MyConfig
 
 config = MyConfig()
 
-#change cwd to the libpinyin evals tool directory
-libpinyindir = config.getEvalsDir()
-os.chdir(libpinyindir)
+#change cwd to the libpinyin data directory
+libpinyin_dir = config.getToolsDir()
+libpinyin_sub_dir = os.path.join(libpinyin_dir, 'data')
+os.chdir(libpinyin_sub_dir)
+#chdir done
 
 datafiles = ['gb_char.table',  'gbk_char.table', \
                  config.getFinalModelFileName(), 'evals.text', \
@@ -23,17 +25,15 @@ datafiles = ['gb_char.table',  'gbk_char.table', \
 
 
 def checkData():
-    cwd = os.getcwd()
-    os.chdir(os.path.join(libpinyindir, 'data'))
+    #check data files
     for onefile in datafiles:
         if not os.access(onefile, os.F_OK):
             sys.exit('missing one data file:' + onefile)
-    os.chdir(cwd)
 
 
 def cleanUpData():
     #begin processing
-    cmdline = ['/usr/bin/make', '-f', 'Makefile.data', 'clean']
+    cmdline = ['/usr/bin/make', 'clean']
     subprocess = Popen(cmdline, shell=False, close_fds=True)
     (pid, status) = os.waitpid(subprocess.pid, 0)
     if status != 0:
@@ -43,7 +43,7 @@ def cleanUpData():
 
 def buildData():
     #begin processing
-    cmdline = ['/usr/bin/make', '-f', 'Makefile.data', 'build']
+    cmdline = ['/usr/bin/make']
     subprocess = Popen(cmdline, shell=False, close_fds=True)
     (pid, status) = os.waitpid(subprocess.pid, 0)
     if status != 0:
@@ -52,9 +52,6 @@ def buildData():
 
 
 def estimateModel(reportfile):
-    #change to utils/training subdir
-    cwd = os.getcwd()
-    os.chdir(os.path.join(libpinyindir, 'data'))
 
     result_line_prefix = "average lambda:"
     avg_lambda = 0.
@@ -82,13 +79,12 @@ def estimateModel(reportfile):
         sys.exit('estimate interpolation model returns error.')
     #end processing
 
-    os.chdir(cwd)
     return avg_lambda
 
 
 def modifyCodeforLambda(lambdaparam):
     #begin processing
-    cmdline = ['/usr/bin/make', '-f', 'Makefile.data', 'rebuild', \
+    cmdline = ['/usr/bin/make', 'rebuild', \
                    'LAMBDA_PARAMETER=' + str(lambdaparam)]
     subprocess = Popen(cmdline, shell=False, close_fds=True)
     (pid, status) = os.waitpid(subprocess.pid, 0)
@@ -98,9 +94,6 @@ def modifyCodeforLambda(lambdaparam):
 
 
 def evaluateModel(reportfile):
-    #change to utils/training subdir
-    cwd = os.getcwd()
-    os.chdir(os.path.join(libpinyindir, 'data'))
 
     result_line_prefix = "correction rate:"
     rate = 0.
@@ -121,7 +114,6 @@ def evaluateModel(reportfile):
     os.waitpid(subprocess.pid, 0)
     #end processing
 
-    os.chdir(cwd)
     return rate
 
 if __name__ == '__main__':
