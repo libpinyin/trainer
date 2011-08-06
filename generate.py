@@ -10,7 +10,7 @@ from myconfig import MyConfig
 
 config = MyConfig()
 
-#change cwd to the libpinyin utils/training directory
+#change cwd to the libpinyin data directory
 libpinyin_dir = config.getToolsDir()
 libpinyin_sub_dir = os.path.join(libpinyin_dir, 'data')
 os.chdir(libpinyin_sub_dir)
