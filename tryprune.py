@@ -13,14 +13,14 @@ config = MyConfig()
 
 #change cwd to the libpinyin utils/training directory
 libpinyin_dir = config.getToolsDir()
-libpinyin_sub_dir = os.path.join(libpinyin_dir, 'utils', 'training')
+libpinyin_sub_dir = os.path.join(libpinyin_dir, 'data')
 os.chdir(libpinyin_sub_dir)
 #chdir done
 
 
 def validateModel(modelfile):
     #begin processing
-    cmdline = ['./validate_k_mixture_model', \
+    cmdline = ['../utils/training/validate_k_mixture_model', \
                    modelfile]
 
     subprocess = Popen(cmdline, shell=False, close_fds=True)
@@ -33,7 +33,7 @@ def validateModel(modelfile):
 
 def exportModel(modelfile, textmodel):
     #begin processing
-    cmdline = ['./export_k_mixture_model', \
+    cmdline = ['../utils/training/export_k_mixture_model', \
                    '--k-mixture-model-file', \
                    modelfile]
 
@@ -52,7 +52,8 @@ def exportModel(modelfile, textmodel):
 
 def convertModel(kmm_model, inter_model):
     #begin processing
-    cmdline = './k_mixture_model_to_interpolation <"' + kmm_model + '"'
+    cmdline = '../utils/training/k_mixture_model_to_interpolation <"' \
+        + kmm_model + '"'
 
     subprocess = Popen(cmdline, shell=True, \
                            stdout=PIPE, close_fds=True)
@@ -77,7 +78,7 @@ def mergeOneModel(mergedmodel, onemodel, score):
         raise AssertionError('estimate scores mis-match.\n')
 
     #begin processing
-    cmdline = ['./merge_k_mixture_model', \
+    cmdline = ['../utils/training/merge_k_mixture_model', \
                    '--result-file', \
                    mergedmodel, \
                    onemodel]
@@ -118,7 +119,7 @@ def mergeSomeModels(mergedmodel, sortedindexname, mergenum):
 
 def pruneModel(prunedmodel, k, CDF):
     #begin processing
-    cmdline = ['./prune_k_mixture_model', \
+    cmdline = ['../utils/training/prune_k_mixture_model', \
                '-k', str(k), '--CDF', str(CDF),
                prunedmodel]
 

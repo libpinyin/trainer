@@ -13,7 +13,7 @@ config = MyConfig()
 
 #change cwd to the libpinyin utils/training directory
 libpinyin_dir = config.getToolsDir()
-libpinyin_sub_dir = os.path.join(libpinyin_dir, 'utils', 'training')
+libpinyin_sub_dir = os.path.join(libpinyin_dir, 'data')
 os.chdir(libpinyin_sub_dir)
 #chdir done
 
@@ -36,7 +36,7 @@ def handleOneModel(modelfile, reportfile):
     avg_lambda = 0.
 
     #begin processing
-    cmdline = ['./estimate_k_mixture_model', \
+    cmdline = ['../utils/training/estimate_k_mixture_model', \
                    '--deleted-bigram-file', \
                    config.getEstimatesModel(), \
                    '--bigram-file', \

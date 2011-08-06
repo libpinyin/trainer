@@ -12,7 +12,7 @@ config = MyConfig()
 
 #change cwd to the libpinyin utils/training directory
 libpinyin_dir = config.getToolsDir()
-libpinyin_sub_dir = os.path.join(libpinyin_dir, 'utils', 'training')
+libpinyin_sub_dir = os.path.join(libpinyin_dir, 'data')
 os.chdir(libpinyin_sub_dir)
 #chdir done
 
@@ -31,7 +31,8 @@ def generateOneText(infile, modelfile, reportfile):
         return False
 
     #begin processing
-    cmdline = ['./gen_k_mixture_model', '--maximum-occurs-allowed', \
+    cmdline = ['../utils/training/gen_k_mixture_model', \
+                   '--maximum-occurs-allowed', \
                    str(config.getMaximumOccursAllowed()), \
                    '--maximum-increase-rates-allowed', \
                    str(config.getMaximumIncreaseRatesAllowed()), \

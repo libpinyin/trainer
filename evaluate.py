@@ -54,13 +54,13 @@ def buildData():
 def estimateModel(reportfile):
     #change to utils/training subdir
     cwd = os.getcwd()
-    os.chdir(os.path.join(libpinyindir, 'utils', 'training'))
+    os.chdir(os.path.join(libpinyindir, 'data'))
 
     result_line_prefix = "average lambda:"
     avg_lambda = 0.
 
     #begin processing
-    cmdline = ['./estimate_interpolation']
+    cmdline = ['../utils/training/estimate_interpolation']
 
     subprocess = Popen(cmdline, shell=False, stdout=PIPE, \
                            close_fds=True)
@@ -100,13 +100,13 @@ def modifyCodeforLambda(lambdaparam):
 def evaluateModel(reportfile):
     #change to utils/training subdir
     cwd = os.getcwd()
-    os.chdir(os.path.join(libpinyindir, 'utils', 'training'))
+    os.chdir(os.path.join(libpinyindir, 'data'))
 
     result_line_prefix = "correction rate:"
     rate = 0.
 
     #begin processing
-    cmdline = './eval_correction_rate 2>"' + reportfile + '"'
+    cmdline = '../utils/training/eval_correction_rate 2>"' + reportfile + '"'
 
     subprocess = Popen(cmdline, shell=True, stdout=PIPE, \
                            close_fds=True)

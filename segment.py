@@ -12,7 +12,7 @@ config = MyConfig()
 
 #change cwd to the libpinyin utils/segment directory
 libpinyin_dir = config.getToolsDir()
-libpinyin_sub_dir = os.path.join(libpinyin_dir, 'utils', 'segment')
+libpinyin_sub_dir = os.path.join(libpinyin_dir, 'data')
 os.chdir(libpinyin_sub_dir)
 #chdir done
 
@@ -28,7 +28,7 @@ def segmentOneText(infile, outfile, reportfile):
         return
 
     #begin processing
-    cmdline = './ngseg >"' + outfile + '"'
+    cmdline = '../utils/segment/ngseg >"' + outfile + '"'
     subprocess = Popen(cmdline, shell=True, stdin=PIPE, stderr=PIPE, \
                            close_fds=True)
 
