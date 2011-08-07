@@ -14,7 +14,7 @@ from myconfig import MyConfig
 config = MyConfig()
 
 #change cwd to the libpinyin data directory
-libpinyin_dir = config.getToolsDir()
+libpinyin_dir = config.getEvalsDir()
 libpinyin_sub_dir = os.path.join(libpinyin_dir, 'data')
 os.chdir(libpinyin_sub_dir)
 #chdir done
@@ -144,7 +144,7 @@ if __name__ == '__main__':
     checkData()
 
     modelfile = os.path.join(trydir, config.getFinalModelFileName())
-    destfile = os.path.join(libpinyindir, 'data', \
+    destfile = os.path.join(libpinyin_dir, 'data', \
                                 config.getFinalModelFileName())
 
     print('copying from ' + modelfile + ' to ' + destfile)
