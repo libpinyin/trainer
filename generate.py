@@ -2,6 +2,7 @@
 import os
 import os.path
 import sys
+import shutil
 from subprocess import Popen, PIPE
 from argparse import ArgumentParser
 import utils
@@ -63,6 +64,10 @@ def generateOneText(infile, modelfile, reportfile):
 def handleOneIndex(indexpath, subdir, indexname, fast):
     inMemoryFile = "model.db"
 
+    modeldir = os.path.join(config.getModelDir(), subdir, indexname)
+    os.makedirs(modeldir, exist_ok=True)
+
+
     def cleanupInMemoryFile():
         modelfile = os.path.join(config.getInMemoryFileSystem(), inMemoryFile)
         reportfile = modelfile + config.getReportPostfix()
@@ -77,8 +82,10 @@ def handleOneIndex(indexpath, subdir, indexname, fast):
         inmemoryreportfile = inmemoryfile + config.getReportPostfix()
         reportfile = modelfile + config.getReportPostfix()
 
-        shutil.copyfile(inmemoryfile, modelfile)
-        shutil.copyfile(inmemoryreportfile, reportfile)
+        if os.access(inmemoryfile, os.F_OK):
+            shutil.copyfile(inmemoryfile, modelfile)
+        if os.access(inmemoryreportfile, os.F_OK):
+            shutil.copyfile(inmemoryreportfile, reportfile)
 
     def cleanupFiles(modelnum):
         modeldir = os.path.join(config.getModelDir(), subdir, indexname)
@@ -138,8 +145,6 @@ def handleOneIndex(indexpath, subdir, indexname, fast):
             print("Skipping " + title + '#' + textpath)
             continue
 
-        modeldir = os.path.join(config.getModelDir(), subdir, indexname)
-        os.makedirs(modeldir, exist_ok=True)
         if fast:
             modelfile = os.path.join(config.getInMemoryFileSystem(), \
                                          inMemoryFile)
