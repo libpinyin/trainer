@@ -5,10 +5,10 @@ class MyConfig:
     ''' My Configuration '''
 
     m_current_epoch = {'SegmentEpoch': 1, \
-                           'GenerateEpoch': 2, \
-                           'EstimateEpoch': 3, \
-                           'PruneEpoch': 4, \
-                           'EvaluateEpoch': 5 \
+                           'GenerateEpoch': 1, \
+                           'EstimateEpoch': 1, \
+                           'PruneEpoch': 1, \
+                           'EvaluateEpoch': 1 \
                            }
 
     def getEpochs(self):
@@ -65,7 +65,7 @@ class MyConfig:
 
     #the trained corpus size of model candidates
     def getCandidateModelSize(self):
-        candidate_model_size = 11.9 * 1024 * 1024 * 2
+        candidate_model_size = 11.9 * 1024 * 1024 * 1
         return candidate_model_size
 
     def getModelPostfix(self):
