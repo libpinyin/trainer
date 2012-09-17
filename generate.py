@@ -60,7 +60,26 @@ def generateOneText(infile, modelfile, reportfile):
 
 
 #Note: should check the corpus file size, and skip the too small text file.
-def handleOneIndex(indexpath, subdir, indexname):
+def handleOneIndex(indexpath, subdir, indexname, fast):
+    inMemoryFile = "model.db"
+
+    def cleanupInMemoryFile():
+        modelfile = os.path.join(config.getInMemoryFileSystem(), inMemoryFile)
+        reportfile = modelfile + config.getReportPostfix()
+        if os.access(modelfile, os.F_OK):
+            os.unlink(modelfile)
+        if os.access(reportfile, os.F_OK):
+            os.unlink(reportfile)
+
+    def copyoutInMemoryFile(modelfile):
+        inmemoryfile = os.path.join\
+            (config.getInMemoryFileSystem(), inMemoryFile)
+        inmemoryreportfile = inmemoryfile + config.getReportPostfix()
+        reportfile = modelfile + config.getReportPostfix()
+
+        shutil.copyfile(inmemoryfile, modelfile)
+        shutil.copyfile(inmemoryreportfile, reportfile)
+
     def cleanupFiles(modelnum):
         modeldir = os.path.join(config.getModelDir(), subdir, indexname)
         modelfile = os.path.join( \
@@ -98,6 +117,9 @@ def handleOneIndex(indexpath, subdir, indexname):
         modelnum = indexstatus['GenerateModelEnd']
 
     #clean up previous file
+    if fast:
+        cleanupInMemoryFile()
+
     cleanupFiles(modelnum)
 
     #begin processing
@@ -118,14 +140,27 @@ def handleOneIndex(indexpath, subdir, indexname):
 
         modeldir = os.path.join(config.getModelDir(), subdir, indexname)
         os.makedirs(modeldir, exist_ok=True)
-        modelfile = os.path.join(modeldir, \
-                                 config.getCandidateModelName(modelnum))
+        if fast:
+            modelfile = os.path.join(config.getInMemoryFileSystem(), \
+                                         inMemoryFile)
+        else:
+            modelfile = os.path.join(modeldir, \
+                                         config.getCandidateModelName(modelnum))
+
         reportfile = modelfile + config.getReportPostfix()
         print("Proccessing " + title + '#' + textpath)
         if generateOneText(infile, modelfile, reportfile):
             aggmodelsize += infilesize
         print("Processed " + title + '#' + textpath)
         if aggmodelsize > config.getCandidateModelSize():
+            #copy out in memory file
+            if fast:
+                modelfile = os.path.join\
+                    (modeldir, config.getCandidateModelName(modelnum))
+                copyoutInMemoryFile(modelfile)
+                cleanupInMemoryFile()
+
+            #the model file is in disk now
             nexttextnum = i + 1
             storeModelStatus(modelfile, textnum, nexttextnum)
 
@@ -142,6 +177,15 @@ def handleOneIndex(indexpath, subdir, indexname):
             indexstatus['GenerateModelEnd'] = modelnum
             utils.store_status(indexstatuspath, indexstatus)
 
+
+    #copy out in memory file
+    if fast:
+        modelfile = os.path.join\
+            (modeldir, config.getCandidateModelName(modelnum))
+        copyoutInMemoryFile(modelfile)
+        cleanupInMemoryFile()
+
+    #the model file is in disk now
     nexttextnum = i + 1
     storeModelStatus(modelfile, textnum, nexttextnum)
 
@@ -157,7 +201,7 @@ def handleOneIndex(indexpath, subdir, indexname):
     utils.store_status(indexstatuspath, indexstatus)
 
 
-def walkThroughIndex(path):
+def walkThroughIndex(path, fast):
     for root, dirs, files in os.walk(path, topdown=True, onerror=handleError):
         for onefile in files:
             filepath = os.path.join(root, onefile)
@@ -165,7 +209,7 @@ def walkThroughIndex(path):
             if onefile.endswith(indexpostfix):
                 subdir = os.path.relpath(root, path)
                 indexname = onefile[:-len(indexpostfix)]
-                handleOneIndex(filepath, subdir, indexname)
+                handleOneIndex(filepath, subdir, indexname, fast)
             elif onefile.endswith(config.getStatusPostfix()):
                 pass
             else:
@@ -177,7 +221,12 @@ if __name__ == '__main__':
                             help='index directory', \
                             default=os.path.join(config.getTextDir(), 'index'))
 
+    parser.add_argument('--fast', action='store_const', \
+                            help='Use in-memory filesystem to speed up generate', \
+                            const=True, default=False)
+
+
     args = parser.parse_args()
     print(args)
-    walkThroughIndex(args.indexdir)
+    walkThroughIndex(args.indexdir, args.fast)
     print('done')
