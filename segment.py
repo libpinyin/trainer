@@ -21,14 +21,18 @@ def handleError(error):
     sys.exit(error)
 
 
-def segmentOneText(infile, outfile, reportfile):
+def segmentOneText(infile, outfile, reportfile, fast):
     infilestatuspath = infile + config.getStatusPostfix()
     infilestatus = utils.load_status(infilestatuspath)
     if utils.check_epoch(infilestatus, 'Segment'):
         return
 
     #begin processing
-    cmdline = '../utils/segment/ngseg >"' + outfile + '"'
+    if fast:
+        cmdline = '../utils/segment/spseg >"' + outfile + '"'
+    else:
+        cmdline = '../utils/segment/ngseg >"' + outfile + '"'
+
     subprocess = Popen(cmdline, shell=True, stdin=PIPE, stderr=PIPE, \
                            close_fds=True)
 
@@ -51,7 +55,7 @@ def segmentOneText(infile, outfile, reportfile):
     utils.store_status(infilestatuspath, infilestatus)
 
 
-def handleOneIndex(indexpath):
+def handleOneIndex(indexpath, fast):
     indexstatuspath = indexpath + config.getStatusPostfix()
     indexstatus = utils.load_status(indexstatuspath)
     if utils.check_epoch(indexstatus, 'Segment'):
@@ -68,7 +72,7 @@ def handleOneIndex(indexpath):
         reportfile = config.getTextDir() + textpath + \
             config.getSegmentReportPostfix()
         print("Processing " + title + '#' + textpath)
-        segmentOneText(infile, outfile, reportfile)
+        segmentOneText(infile, outfile, reportfile, fast)
         print("Processed " + title + '#' + textpath)
     indexfile.close()
     #end processing
@@ -77,12 +81,12 @@ def handleOneIndex(indexpath):
     utils.store_status(indexstatuspath, indexstatus)
 
 
-def walkThroughIndex(path):
+def walkThroughIndex(path, fast):
     for root, dirs, files in os.walk(path, topdown=True, onerror=handleError):
         for onefile in files:
             filepath = os.path.join(root, onefile)
             if onefile.endswith(config.getIndexPostfix()):
-                handleOneIndex(filepath)
+                handleOneIndex(filepath, fast)
             elif onefile.endswith(config.getStatusPostfix()):
                 pass
             else:
@@ -95,7 +99,11 @@ if __name__ == '__main__':
                             help='index directory', \
                             default=os.path.join(config.getTextDir(), 'index'))
 
+    parser.add_argument('--fast', action='store_const', \
+                            help='Use spseg to speed up segment', \
+                            const=True, default=False)
+
     args = parser.parse_args()
     print(args)
-    walkThroughIndex(args.indexdir)
+    walkThroughIndex(args.indexdir, args.fast)
     print('done')
