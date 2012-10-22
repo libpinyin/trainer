@@ -51,9 +51,8 @@ class MyConfig:
     def getInMemoryFileSystem(self):
         return '/dev/shm'
 
-    def getEvalsText(self):
-        evals_text = m_evals_dir + '/data/evals.text'
-        return evals_text
+    def getEvalsTextFileName(self):
+        return 'evals2.text'
 
     def getMinimumFileSize(self):
         #about 1,200 Chinese characters

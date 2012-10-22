@@ -20,7 +20,8 @@ os.chdir(libpinyin_sub_dir)
 #chdir done
 
 datafiles = ['gb_char.table',  'gbk_char.table', \
-                 config.getFinalModelFileName(), 'evals.text', \
+                 config.getFinalModelFileName(), \
+                 config.getEvalsTextFileName(), \
                  'deleted_bigram.db']
 
 
