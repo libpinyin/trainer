@@ -101,7 +101,7 @@ class MyConfig:
         return '.text'
 
     def getFinalModelFileName(self):
-        return 'interpolation.text'
+        return 'interpolation2.text'
 
     def getFinalStatusFileName(self):
         return 'cwd.status'
