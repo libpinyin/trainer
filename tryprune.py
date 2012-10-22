@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 import os
 import os.path
-import shutil
 import sys
 from subprocess import Popen, PIPE
 from argparse import ArgumentParser
@@ -200,13 +199,13 @@ if __name__ == '__main__':
         if os.access(shmmodel, os.F_OK):
             os.unlink(shmmodel)
         #copy to memory
-        shutil.copyfile(mergedmodel, shmmodel)
+        utils.copyfile(mergedmodel, shmmodel)
         pruneModel(shmmodel, args.k, args.CDF)
         #copy to filesystem
-        shutil.copyfile(shmmodel, prunedmodel)
+        utils.copyfile(shmmodel, prunedmodel)
     else:
         #backup merged model
-        shutil.copyfile(mergedmodel, prunedmodel)
+        utils.copyfile(mergedmodel, prunedmodel)
         pruneModel(prunedmodel, args.k, args.CDF)
 
     #validate pruned model

@@ -1,6 +1,7 @@
 import io
 import os
 import json
+import shutil
 from myconfig import MyConfig
 
 
@@ -39,6 +40,10 @@ def get_file_length(infile):
     length = f.tell()
     f.close()
     return length
+
+def copyfile(src, dst):
+    print('copying from ' + src + ' to ' + dst)
+    shutil.copyfile(src, dst)
 
 
 #JSON Load/Store

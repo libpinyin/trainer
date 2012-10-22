@@ -2,7 +2,6 @@
 import os
 import os.path
 import sys
-import shutil
 from subprocess import Popen, PIPE
 from argparse import ArgumentParser
 import utils
@@ -83,9 +82,9 @@ def handleOneIndex(indexpath, subdir, indexname, fast):
         reportfile = modelfile + config.getReportPostfix()
 
         if os.access(inmemoryfile, os.F_OK):
-            shutil.copyfile(inmemoryfile, modelfile)
+            utils.copyfile(inmemoryfile, modelfile)
         if os.access(inmemoryreportfile, os.F_OK):
-            shutil.copyfile(inmemoryreportfile, reportfile)
+            utils.copyfile(inmemoryreportfile, reportfile)
 
     def cleanupFiles(modelnum):
         modeldir = os.path.join(config.getModelDir(), subdir, indexname)

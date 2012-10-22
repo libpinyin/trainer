@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 import os
 import os.path
-import shutil
 import sys
 from subprocess import Popen, PIPE
 from argparse import ArgumentParser
@@ -148,8 +147,7 @@ if __name__ == '__main__':
     destfile = os.path.join(libpinyin_dir, 'data', \
                                 config.getFinalModelFileName())
 
-    print('copying from ' + modelfile + ' to ' + destfile)
-    shutil.copyfile(modelfile, destfile)
+    utils.copyfile(modelfile, destfile)
 
     print('cleaning')
     cleanUpData()
