@@ -104,3 +104,17 @@ class MyConfig:
 
     def getFinalStatusFileName(self):
         return 'cwd.status'
+
+
+    '''
+    Word Recognizer Configuration
+    '''
+
+    def getWordRecognizerDir(self):
+        return m_trainer_dir + os.sep + 'words'
+
+    def getMaximumCombineNumber(self):
+        return 5
+
+    def getThresHold(self):
+        return 0.10 # the last 10% in position
