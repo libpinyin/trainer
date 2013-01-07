@@ -8,7 +8,8 @@ class MyConfig:
                            'GenerateEpoch': 1, \
                            'EstimateEpoch': 1, \
                            'PruneEpoch': 1, \
-                           'EvaluateEpoch': 1 \
+                           'EvaluateEpoch': 1, \
+                           'PrepareEpoch': 2, \
                            }
 
     def getEpochs(self):
@@ -111,7 +112,7 @@ class MyConfig:
     '''
 
     def getWordRecognizerDir(self):
-        return m_trainer_dir + os.sep + 'words'
+        return self.m_trainer_dir + os.sep + 'words'
 
     def getMaximumCombineNumber(self):
         return 5
