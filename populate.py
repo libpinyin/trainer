@@ -7,24 +7,20 @@ import utils
 from myconfig import MyConfig
 
 
-SELECT_NGRAM_DML = '''
-Select freq from ngram where words = "?";
-'''
-
 INSERT_NGRAM_DML = '''
-Insert into ngram(words, freq) values("?", ?);
+INSERT INTO ngram(words, freq) VALUES(?, 1);
 '''
 
 UPDATE_NGRAM_DML = '''
-Update ngram set freq = ? where words = "?";
+UPDATE ngram SET freq = freq + 1 WHERE words = ?;
 '''
 
 SELECT_ALL_DML = '''
-Select words, freq from ngram;
+SELECT words, freq FROM ngram;
 '''
 
 INSERT_BIGRAM_DML = '''
-Insert into bigram(prefix, postfix, freq) values ("?", "?", ?);
+INSERT INTO bigram(prefix, postfix, freq) VALUES (?, ?, ?);
 '''
 
 config = MyConfig()
@@ -59,6 +55,8 @@ def handleOneDocument(infile, conn, length):
     docfile = open(infile + config.getSegmentPostfix(), 'r')
     words = []
 
+    cur = conn.cursor()
+
     for oneline in docfile.readlines():
         oneline = oneline.rstrip(os.linesep)
 
@@ -83,7 +81,11 @@ def handleOneDocument(infile, conn, length):
 
         #do sqlite training
         words_str = sep + sep.join(words) + sep
-        print(words)
+
+        rowcount = cur.execute(UPDATE_NGRAM_DML, (words_str,)).rowcount
+        #print(rowcount)
+        if 0 == rowcount:
+            cur.execute(INSERT_NGRAM_DML, (words_str,))
 
     docfile.close()
 
