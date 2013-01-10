@@ -8,14 +8,18 @@ from myconfig import MyConfig
 
 
 CREATE_NGRAM_DDL = '''
-Create Table ngram (
+CREATE TABLE ngram (
       words TEXT NOT NULL,
       freq INTEGER NOT NULL
       );
 '''
 
+CREATE_NGRAM_INDEX_DDL = '''
+CREATE UNIQUE INDEX ngram_index on ngram(words);
+'''
+
 CREATE_BIGRAM_DDL = '''
-Create Table bigram (
+CREATE TABLE bigram (
       prefix TEXT NOT NULL,
       postfix TEXT NOT NULL,
       freq INTEGER NOT NULL
@@ -56,6 +60,7 @@ def createSqliteDatabases(onedir):
         cur = conn.cursor()
 
         cur.execute(CREATE_NGRAM_DDL)
+        cur.execute(CREATE_NGRAM_INDEX_DDL)
 
         #special case for bi-gram
         if 2 == i:
