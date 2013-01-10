@@ -10,6 +10,7 @@ class MyConfig:
                            'PruneEpoch': 1, \
                            'EvaluateEpoch': 1, \
                            'PrepareEpoch': 2, \
+                           'PopulateEpoch': 3, \
                            }
 
     def getEpochs(self):
@@ -113,6 +114,12 @@ class MyConfig:
 
     def getWordRecognizerDir(self):
         return self.m_trainer_dir + os.sep + 'words'
+
+    def getNgramFileName(self, length):
+        return str(length) + '-gram.db'
+
+    def getWordSep(self):
+        return " "
 
     def getMaximumCombineNumber(self):
         N = 5

@@ -43,7 +43,7 @@ def createSqliteDatabases(onedir):
 
     #create databases
     for i in range(1, N + 1):
-        filename = str(i) + '-gram.db';
+        filename = config.getNgramFileName(i)
         filepath = onedir + os.sep + filename
         print(filepath)
 
