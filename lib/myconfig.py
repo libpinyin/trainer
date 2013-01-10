@@ -115,7 +115,12 @@ class MyConfig:
         return self.m_trainer_dir + os.sep + 'words'
 
     def getMaximumCombineNumber(self):
-        return 5
+        N = 5
+        assert N >= 2, 'at least bi-gram'
+        return N
 
-    def getThresHold(self):
+    def getPartialWordThresHold(self):
         return 0.10 # the last 10% in position
+
+    def getNewWordThresHold(self):
+        return 0.10 / 2 # the last 5% in position
