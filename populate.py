@@ -94,9 +94,11 @@ def handleOneDocument(infile, conn, length):
 
     docfile.close()
 
-    #sign epoch
-    utils.sign_epoch(infilestatus, 'Populate')
-    utils.store_status(infilestatuspath, infilestatus)
+    #sign epoch only after last pass
+    if N == length:
+        utils.sign_epoch(infilestatus, 'Populate')
+        utils.store_status(infilestatuspath, infilestatus)
+
     return True
 
 def handleOnePass(indexpath, workdir, length):
