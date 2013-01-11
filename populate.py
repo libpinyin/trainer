@@ -15,8 +15,12 @@ UPDATE_NGRAM_DML = '''
 UPDATE ngram SET freq = freq + 1 WHERE words = ?;
 '''
 
-SELECT_ALL_DML = '''
+SELECT_ALL_NGRAM_DML = '''
 SELECT words, freq FROM ngram;
+'''
+
+DELETE_BIGRAM_DML = '''
+DELETE FROM bigram;
 '''
 
 INSERT_BIGRAM_DML = '''
@@ -81,6 +85,7 @@ def handleOneDocument(infile, conn, length):
 
         #do sqlite training
         words_str = sep + sep.join(words) + sep
+        #print(words_str)
 
         rowcount = cur.execute(UPDATE_NGRAM_DML, (words_str,)).rowcount
         #print(rowcount)
@@ -90,8 +95,8 @@ def handleOneDocument(infile, conn, length):
     docfile.close()
 
     #sign epoch
-    #utils.sign_epoch(infilestatus, 'Populate')
-    #utils.store_status(infilestatuspath, infilestatus)
+    utils.sign_epoch(infilestatus, 'Populate')
+    utils.store_status(infilestatuspath, infilestatus)
     return True
 
 def handleOnePass(indexpath, workdir, length):
@@ -125,7 +130,30 @@ def handleOnePass(indexpath, workdir, length):
         conn.close()
 
 def handleBigramPass(indexpath, workdir):
-    pass
+    print(indexpath, workdir, 'bigram')
+    length = 2
+
+    sep = config.getWordSep()
+
+    filename = config.getNgramFileName(length)
+    filepath = workdir + os.sep + filename
+
+    #begin processing
+    conn = sqlite3.connect(filepath)
+    cur = conn.cursor()
+
+    cur.execute(DELETE_BIGRAM_DML)
+    rows = cur.execute(SELECT_ALL_NGRAM_DML).fetchall()
+    for row in rows:
+        (words_str, freq) = row
+
+        words = words_str.strip(sep).split(sep, 1)
+        assert len(words) == length
+
+        (prefix, postfix) = words
+
+        cur.execute(INSERT_BIGRAM_DML, (prefix, postfix, freq))
+        #print(prefix, postfix, freq)
 
 
 def handleOneIndex(indexpath, subdir, indexname):
@@ -148,8 +176,8 @@ def handleOneIndex(indexpath, subdir, indexname):
     handleBigramPass(indexpath, workdir)
 
     #sign epoch
-    #utils.sign_epoch(indexstatus, 'Populate')
-    #utils.store_status(indexstatuspath, indexstatus)
+    utils.sign_epoch(indexstatus, 'Populate')
+    utils.store_status(indexstatuspath, indexstatus)
     
 
 
