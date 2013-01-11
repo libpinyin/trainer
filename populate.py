@@ -155,6 +155,11 @@ def handleBigramPass(indexpath, workdir):
         cur.execute(INSERT_BIGRAM_DML, (prefix, postfix, freq))
         #print(prefix, postfix, freq)
 
+    conn.commit()
+
+    if conn:
+        conn.close()
+
 
 def handleOneIndex(indexpath, subdir, indexname):
     print(indexpath, subdir, indexname)
