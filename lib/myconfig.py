@@ -131,3 +131,6 @@ class MyConfig:
 
     def getNewWordThresHold(self):
         return 0.10 / 2 # the last 5% in position
+
+    def getMaximumIteration(self):
+        return 20 # roughly around N
