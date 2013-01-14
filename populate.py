@@ -163,7 +163,7 @@ def handleBigramPass(indexpath, workdir):
         conn.close()
 
 
-def handleOneIndex(indexpath, subdir, indexname):
+def handleOneIndex(indexpath, subdir, indexname, fast):
     print(indexpath, subdir, indexname)
 
     indexstatuspath = indexpath + config.getStatusPostfix()
@@ -177,8 +177,20 @@ def handleOneIndex(indexpath, subdir, indexname):
         subdir + os.sep + indexname
     print(workdir)
 
+    shmdir = config.getInMemoryFileSystem()
+
     for i in range(1, N + 1):
-        handleOnePass(indexpath, workdir, i)
+        if fast:
+            #copy file
+            filename = config.getNgramFileName(i)
+            filepath = workdir + os.sep + filename
+            shmfilepath = shmdir + os.sep + filename
+            utils.copyfile(filepath, shmfilepath)
+            handleOnePass(indexpath, shmdir, i)
+            utils.copyfile(shmfilepath, filepath)
+            os.unlink(shmfilepath)
+        else:
+            handleOnePass(indexpath, workdir, i)
 
     handleBigramPass(indexpath, workdir)
 
@@ -188,7 +200,7 @@ def handleOneIndex(indexpath, subdir, indexname):
     
 
 
-def walkThroughIndex(path):
+def walkThroughIndex(path, fast):
     for root, dirs, files in os.walk(path, topdown=True, onerror=handleError):
         for onefile in files:
             filepath = os.path.join(root, onefile)
@@ -196,7 +208,7 @@ def walkThroughIndex(path):
             if onefile.endswith(indexpostfix):
                 subdir = os.path.relpath(root, path)
                 indexname = onefile[:-len(indexpostfix)]
-                handleOneIndex(filepath, subdir, indexname)
+                handleOneIndex(filepath, subdir, indexname, fast)
             elif onefile.endswith(config.getStatusPostfix()):
                 pass
             else:
@@ -209,7 +221,12 @@ if __name__ == '__main__':
                             help='index directory', \
                             default=os.path.join(config.getTextDir(), 'index'))
 
+    parser.add_argument('--fast', action='store_const', \
+                            help='Use /dev/shm to speed up populate', \
+                            const=True, default=False)
+
+
     args = parser.parse_args()
     print(args)
-    walkThroughIndex(args.indexdir)
+    walkThroughIndex(args.indexdir, args.fast)
     print('done')
