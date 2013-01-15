@@ -11,6 +11,7 @@ class MyConfig:
                            'EvaluateEpoch': 1, \
                            'PrepareEpoch': 2, \
                            'PopulateEpoch': 3, \
+                           'PartialWordThresholdEpoch': 4, \
                            }
 
     def getEpochs(self):
@@ -129,11 +130,17 @@ class MyConfig:
     def getMinimumOccurrence(self):
         return 3 # minimum word occurrence
 
-    def getPartialWordThresHold(self):
+    def getPartialWordThreshold(self):
         return 0.10 # the last 10% in position
 
-    def getNewWordThresHold(self):
+    def getNewWordThreshold(self):
         return 0.10 / 2 # the last 5% in position
 
     def getMaximumIteration(self):
         return 20 # roughly around N
+
+    def getWordsListFileName(self):
+        return "words.txt"
+
+    def getWordsWithPinyinFileName(self):
+        return "oldwords.txt"
