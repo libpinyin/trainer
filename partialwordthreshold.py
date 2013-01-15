@@ -29,12 +29,12 @@ def getWordFrequency(conn, word):
     word_str = sep + word + sep
 
     cur = conn.cursor()
-    row = cur.execute(SELECT_WORD_DML, word_str).fetchone()
+    row = cur.execute(SELECT_WORD_DML, (word_str, )).fetchone()
 
     if None == row:
         return 0
     else:
-        (freq) = row
+        freq = row[0]
         return freq
 
 
@@ -61,7 +61,7 @@ def computeThreshold(conn):
 
     #ascending sort
     wordswithfreq.sort(key=itemgetter(1))
-    pos = len(wordswithfreq) * config.getPartialWordThreshold()
+    pos = int(len(wordswithfreq) * config.getPartialWordThreshold())
     threshold = wordswithfreq[pos]
 
     return threshold

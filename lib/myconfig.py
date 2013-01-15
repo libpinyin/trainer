@@ -131,10 +131,10 @@ class MyConfig:
         return 3 # minimum word occurrence
 
     def getPartialWordThreshold(self):
-        return 0.10 # the last 10% in position
+        return 0.30 # the last 10% in position
 
     def getNewWordThreshold(self):
-        return 0.10 / 2 # the last 5% in position
+        return 0.30 / 2 # the last 5% in position
 
     def getMaximumIteration(self):
         return 20 # roughly around N
