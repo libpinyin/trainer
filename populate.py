@@ -34,7 +34,6 @@ N = config.getMaximumCombineNumber()
 
 #change cwd to the word recognizer directory
 words_dir = config.getWordRecognizerDir()
-os.makedirs(words_dir, exist_ok=True)
 os.chdir(words_dir)
 #chdir done
 

@@ -15,7 +15,6 @@ config = MyConfig()
 
 #change cwd to the word recognizer directory
 words_dir = config.getWordRecognizerDir()
-os.makedirs(words_dir, exist_ok=True)
 os.chdir(words_dir)
 #chdir done
 
@@ -62,12 +61,12 @@ def computeThreshold(conn):
     #ascending sort
     wordswithfreq.sort(key=itemgetter(1))
     pos = int(len(wordswithfreq) * config.getPartialWordThreshold())
-    threshold = wordswithfreq[pos]
+    threshold = wordswithfreq[-pos]
 
     return threshold
 
 
-def handleOneIndex(filepath, subdir, indexname):
+def handleOneIndex(indexpath, subdir, indexname):
     print(indexpath, subdir, indexname)
 
     indexstatuspath = indexpath + config.getStatusPostfix()
@@ -88,8 +87,8 @@ def handleOneIndex(filepath, subdir, indexname):
 
     conn = sqlite3.connect(filepath)
 
-    threshold = computeThreshold(conn)
-    print(threshold)
+    (word, threshold)= computeThreshold(conn)
+    print(word, threshold)
     indexstatus['PartialWordThreshold'] = threshold
 
     conn.commit()
@@ -97,8 +96,8 @@ def handleOneIndex(filepath, subdir, indexname):
         conn.close()
 
     #sign epoch
-    #utils.sign_epoch(indexstatus, 'PartialWordThreshold')
-    #utils.store_status(indexstatuspath, indexstatus)
+    utils.sign_epoch(indexstatus, 'PartialWordThreshold')
+    utils.store_status(indexstatuspath, indexstatus)
 
 
 def walkThroughIndex(path):
