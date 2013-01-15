@@ -126,6 +126,9 @@ class MyConfig:
         assert N >= 2, 'at least bi-gram'
         return N
 
+    def getMinimumOccurrence(self):
+        return 3 # minimum word occurrence
+
     def getPartialWordThresHold(self):
         return 0.10 # the last 10% in position
 
