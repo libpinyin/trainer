@@ -61,8 +61,8 @@ def computeThreshold(conn):
     #ascending sort
     wordswithfreq.sort(key=itemgetter(1))
     pos = int(len(wordswithfreq) * config.getPartialWordThreshold())
-    threshold = wordswithfreq[-pos]
-
+    (word, threshold) = wordswithfreq[-pos]
+    print(word, threshold)
     return threshold
 
 
@@ -87,8 +87,7 @@ def handleOneIndex(indexpath, subdir, indexname):
 
     conn = sqlite3.connect(filepath)
 
-    (word, threshold)= computeThreshold(conn)
-    print(word, threshold)
+    threshold = computeThreshold(conn)
     indexstatus['PartialWordThreshold'] = threshold
 
     conn.commit()
