@@ -141,6 +141,9 @@ class MyConfig:
     def getMaximumIteration(self):
         return 20 # roughly around N
 
+    def getBigramFileName(self):
+        return "bigram.db"
+
     def getWordsListFileName(self):
         return "words.txt"
 

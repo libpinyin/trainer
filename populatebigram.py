@@ -19,10 +19,6 @@ SELECT_ALL_NGRAM_DML = '''
 SELECT words, freq FROM ngram;
 '''
 
-DELETE_BIGRAM_DML = '''
-DELETE FROM bigram;
-'''
-
 INSERT_BIGRAM_DML = '''
 INSERT INTO bigram(prefix, postfix, freq) VALUES (?, ?, ?);
 '''
@@ -42,9 +38,8 @@ def handleError(error):
 
 def createBigramSqlite(indexpath, workdir):
     print(indexpath, workdir, 'create bigram')
-    length = 2
 
-    filename = config.getNgramFileName(length)
+    filename = config.getBigramFileName()
     filepath = workdir + os.sep + filename
     print(filepath)
 
@@ -61,19 +56,24 @@ def createBigramSqlite(indexpath, workdir):
 
 def handleBigramPass(indexpath, workdir):
     print(indexpath, workdir, 'bigram pass')
-    length = 2
 
     sep = config.getWordSep()
 
+    filename = config.getBigramFileName()
+    filepath = workdir + os.sep + filename
+
+    bigram_conn = sqlite3.connect(filepath)
+    bigram_cur = bigram_conn.cursor()
+
+    length = 2
     filename = config.getNgramFileName(length)
     filepath = workdir + os.sep + filename
 
-    #begin processing
-    conn = sqlite3.connect(filepath)
-    cur = conn.cursor()
+    ngram_conn = sqlite3.connect(filepath)
+    ngram_cur = ngram_conn.cursor()
 
-    cur.execute(DELETE_BIGRAM_DML)
-    rows = cur.execute(SELECT_ALL_NGRAM_DML).fetchall()
+    #begin processing
+    rows = ngram_cur.execute(SELECT_ALL_NGRAM_DML).fetchall()
     for row in rows:
         (words_str, freq) = row
 
@@ -82,16 +82,19 @@ def handleBigramPass(indexpath, workdir):
 
         (prefix, postfix) = words
 
-        cur.execute(INSERT_BIGRAM_DML, (prefix, postfix, freq))
+        bigram_cur.execute(INSERT_BIGRAM_DML, (prefix, postfix, freq))
         #print(prefix, postfix, freq)
 
-    conn.commit()
+    bigram_conn.commit()
+    ngram_conn.commit()
 
-    if conn:
-        conn.close()
+    if bigram_conn:
+        bigram_conn.close()
+    if ngram_conn:
+        ngram_conn.close()
 
 
-def handleOneIndex(indexpath, subdir, indexname, fast):
+def handleOneIndex(indexpath, subdir, indexname):
     print(indexpath, subdir, indexname)
 
     indexstatuspath = indexpath + config.getStatusPostfix()
@@ -126,3 +129,15 @@ def walkThroughIndex(path):
                 pass
             else:
                 print('Unexpected file:' + filepath)
+
+
+if __name__ == '__main__':
+    parser = ArgumentParser(description='Populate bi-gram.')
+    parser.add_argument('--indexdir', action='store', \
+                            help='index directory', \
+                            default=os.path.join(config.getTextDir(), 'index'))
+
+    args = parser.parse_args()
+    print(args)
+    walkThroughIndex(args.indexdir)
+    print('done')
