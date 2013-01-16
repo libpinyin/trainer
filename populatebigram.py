@@ -116,7 +116,7 @@ if __name__ == '__main__':
     parser = ArgumentParser(description='Populate bi-gram.')
     parser.add_argument('--indexdir', action='store', \
                             help='index directory', \
-                            default=os.path.join(config.getTextDir(), 'index'))
+                            default=config.getTextIndexDir())
 
     args = parser.parse_args()
     print(args)

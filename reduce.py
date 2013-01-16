@@ -53,7 +53,7 @@ if __name__ == '__main__':
                             help='original index directory')
     parser.add_argument('--destdir', action='store', \
                             help='reduced index directory', \
-                            default=os.path.join(config.getTextDir(), 'index'))
+                            default=config.getTextIndexDir())
 
     args = parser.parse_args()
     print(args)

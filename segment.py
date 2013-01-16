@@ -97,7 +97,7 @@ if __name__ == '__main__':
     parser = ArgumentParser(description='Segment all raw corpus documents.')
     parser.add_argument('--indexdir', action='store', \
                             help='index directory', \
-                            default=os.path.join(config.getTextDir(), 'index'))
+                            default=config.getTextIndexDir())
 
     parser.add_argument('--fast', action='store_const', \
                             help='Use spseg to speed up segment', \

@@ -27,6 +27,9 @@ class MyConfig:
     def getTextDir(self):
         return self.m_trainer_dir + os.sep + 'texts'
 
+    def getTextIndexDir(self):
+        return self.m_trainer_dir + os.sep + 'texts' + os.sep + 'index'
+
     def getModelDir(self):
         return self.m_trainer_dir + os.sep + 'models'
 

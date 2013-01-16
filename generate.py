@@ -205,7 +205,7 @@ if __name__ == '__main__':
     parser = ArgumentParser(description='Generate model candidates.')
     parser.add_argument('--indexdir', action='store', \
                             help='index directory', \
-                            default=os.path.join(config.getTextDir(), 'index'))
+                            default=config.getTextIndexDir())
 
     parser.add_argument('--fast', action='store_const', \
                             help='Use in-memory filesystem to speed up generate', \

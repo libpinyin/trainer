@@ -85,7 +85,7 @@ if __name__ == '__main__':
     parser = ArgumentParser(description='Prepare word recognizer.')
     parser.add_argument('--indexdir', action='store', \
                             help='index directory', \
-                            default=os.path.join(config.getTextDir(), 'index'))
+                            default=config.getTextIndexDir())
 
     args = parser.parse_args()
     print(args)
