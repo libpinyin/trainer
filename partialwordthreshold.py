@@ -5,7 +5,7 @@ from argparse import ArgumentParser
 from operator import itemgetter
 import utils
 from myconfig import MyConfig
-
+from dirwalk import walkIndex
 
 SELECT_WORD_DML = '''
 SELECT freq from ngram where words = ?;
@@ -17,10 +17,6 @@ config = MyConfig()
 words_dir = config.getWordRecognizerDir()
 os.chdir(words_dir)
 #chdir done
-
-
-def handleError(error):
-    sys.exit(error)
 
 
 def getWordFrequency(conn, word):
@@ -99,21 +95,6 @@ def handleOneIndex(indexpath, subdir, indexname):
     utils.store_status(indexstatuspath, indexstatus)
 
 
-def walkThroughIndex(path):
-    for root, dirs, files in os.walk(path, topdown=True, onerror=handleError):
-        for onefile in files:
-            filepath = os.path.join(root, onefile)
-            indexpostfix = config.getIndexPostfix()
-            if onefile.endswith(indexpostfix):
-                subdir = os.path.relpath(root, path)
-                indexname = onefile[:-len(indexpostfix)]
-                handleOneIndex(filepath, subdir, indexname)
-            elif onefile.endswith(config.getStatusPostfix()):
-                pass
-            else:
-                print('Unexpected file:' + filepath)
-
-
 if __name__ == '__main__':
     parser = ArgumentParser(description='Partial word threshold.')
     parser.add_argument('--indexdir', action = 'store', \
@@ -122,5 +103,5 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
     print(args)
-    walkThroughIndex(args.indexdir)
+    walkIndex(handleOneIndex, args.indexdir)
     print('done')

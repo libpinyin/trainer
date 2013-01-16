@@ -5,6 +5,7 @@ import sqlite3
 from argparse import ArgumentParser
 import utils
 from myconfig import MyConfig
+from dirwalk import walkIndex
 
 
 CREATE_NGRAM_DDL = '''
@@ -29,10 +30,6 @@ words_dir = config.getWordRecognizerDir()
 os.makedirs(words_dir, exist_ok=True)
 os.chdir(words_dir)
 #chdir done
-
-
-def handleError(error):
-    sys.exit(error)
 
 
 def createSqliteDatabases(onedir):
@@ -83,20 +80,6 @@ def handleOneIndex(indexpath, subdir, indexname):
     utils.sign_epoch(indexstatus, 'Prepare')
     utils.store_status(indexstatuspath, indexstatus)
 
-def walkThroughIndex(path):
-    for root, dirs, files in os.walk(path, topdown=True, onerror=handleError):
-        for onefile in files:
-            filepath = os.path.join(root, onefile)
-            indexpostfix = config.getIndexPostfix()
-            if onefile.endswith(indexpostfix):
-                subdir = os.path.relpath(root, path)
-                indexname = onefile[:-len(indexpostfix)]
-                handleOneIndex(filepath, subdir, indexname)
-            elif onefile.endswith(config.getStatusPostfix()):
-                pass
-            else:
-                print('Unexpected file:' + filepath)
-
 
 if __name__ == '__main__':
     parser = ArgumentParser(description='Prepare word recognizer.')
@@ -106,5 +89,5 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
     print(args)
-    walkThroughIndex(args.indexdir)
+    walkIndex(handleOneIndex, args.indexdir)
     print('done')
