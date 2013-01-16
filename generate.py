@@ -6,7 +6,7 @@ from subprocess import Popen, PIPE
 from argparse import ArgumentParser
 import utils
 from myconfig import MyConfig
-
+from dirwalk import walkIndexFast
 
 config = MyConfig()
 
@@ -15,10 +15,6 @@ libpinyin_dir = config.getToolsDir()
 libpinyin_sub_dir = os.path.join(libpinyin_dir, 'data')
 os.chdir(libpinyin_sub_dir)
 #chdir done
-
-
-def handleError(error):
-    sys.exit(error)
 
 
 #Note: all file passed here should be trained.
@@ -205,20 +201,6 @@ def handleOneIndex(indexpath, subdir, indexname, fast):
     utils.store_status(indexstatuspath, indexstatus)
 
 
-def walkThroughIndex(path, fast):
-    for root, dirs, files in os.walk(path, topdown=True, onerror=handleError):
-        for onefile in files:
-            filepath = os.path.join(root, onefile)
-            indexpostfix = config.getIndexPostfix()
-            if onefile.endswith(indexpostfix):
-                subdir = os.path.relpath(root, path)
-                indexname = onefile[:-len(indexpostfix)]
-                handleOneIndex(filepath, subdir, indexname, fast)
-            elif onefile.endswith(config.getStatusPostfix()):
-                pass
-            else:
-                print('Unexpected file:' + filepath)
-
 if __name__ == '__main__':
     parser = ArgumentParser(description='Generate model candidates.')
     parser.add_argument('--indexdir', action='store', \
@@ -232,5 +214,5 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
     print(args)
-    walkThroughIndex(args.indexdir, args.fast)
+    walkIndexFast(handleOneIndex, args.indexdir, args.fast)
     print('done')
