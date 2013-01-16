@@ -15,17 +15,6 @@ UPDATE_NGRAM_DML = '''
 UPDATE ngram SET freq = freq + 1 WHERE words = ?;
 '''
 
-SELECT_ALL_NGRAM_DML = '''
-SELECT words, freq FROM ngram;
-'''
-
-DELETE_BIGRAM_DML = '''
-DELETE FROM bigram;
-'''
-
-INSERT_BIGRAM_DML = '''
-INSERT INTO bigram(prefix, postfix, freq) VALUES (?, ?, ?);
-'''
 
 config = MyConfig()
 
@@ -130,37 +119,6 @@ def handleOnePass(indexpath, workdir, length):
     if conn:
         conn.close()
 
-def handleBigramPass(indexpath, workdir):
-    print(indexpath, workdir, 'bigram')
-    length = 2
-
-    sep = config.getWordSep()
-
-    filename = config.getNgramFileName(length)
-    filepath = workdir + os.sep + filename
-
-    #begin processing
-    conn = sqlite3.connect(filepath)
-    cur = conn.cursor()
-
-    cur.execute(DELETE_BIGRAM_DML)
-    rows = cur.execute(SELECT_ALL_NGRAM_DML).fetchall()
-    for row in rows:
-        (words_str, freq) = row
-
-        words = words_str.strip(sep).split(sep, 1)
-        assert len(words) == length
-
-        (prefix, postfix) = words
-
-        cur.execute(INSERT_BIGRAM_DML, (prefix, postfix, freq))
-        #print(prefix, postfix, freq)
-
-    conn.commit()
-
-    if conn:
-        conn.close()
-
 
 def handleOneIndex(indexpath, subdir, indexname, fast):
     print(indexpath, subdir, indexname)
@@ -191,12 +149,9 @@ def handleOneIndex(indexpath, subdir, indexname, fast):
         else:
             handleOnePass(indexpath, workdir, i)
 
-    handleBigramPass(indexpath, workdir)
-
     #sign epoch
     utils.sign_epoch(indexstatus, 'Populate')
     utils.store_status(indexstatuspath, indexstatus)
-    
 
 
 def walkThroughIndex(path, fast):

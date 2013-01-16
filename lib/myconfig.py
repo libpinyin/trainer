@@ -12,6 +12,8 @@ class MyConfig:
                            'PrepareEpoch': 2, \
                            'PopulateEpoch': 3, \
                            'PartialWordThresholdEpoch': 4, \
+                           'PartialWordEpoch': 5, \
+                           'PopulateBigramEpoch': 6, \
                            }
 
     def getEpochs(self):

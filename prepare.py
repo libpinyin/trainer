@@ -18,13 +18,6 @@ CREATE_NGRAM_INDEX_DDL = '''
 CREATE UNIQUE INDEX ngram_index on ngram(words);
 '''
 
-CREATE_BIGRAM_DDL = '''
-CREATE TABLE bigram (
-      prefix TEXT NOT NULL,
-      postfix TEXT NOT NULL,
-      freq INTEGER NOT NULL
-      );
-'''
 
 config = MyConfig()
 
@@ -61,10 +54,6 @@ def createSqliteDatabases(onedir):
 
         cur.execute(CREATE_NGRAM_DDL)
         cur.execute(CREATE_NGRAM_INDEX_DDL)
-
-        #special case for bi-gram
-        if 2 == i:
-            cur.execute(CREATE_BIGRAM_DDL)
 
         conn.commit()
 
