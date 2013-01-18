@@ -75,3 +75,20 @@ def load_words(filename):
 
 load_words(config.getWordsListFileName())
 #print(words_set)
+
+
+def createNgramTableClone(conn):
+    cur = conn.cursor()
+
+    cur.execute(CREATE_NGRAM_FTS_DDL)
+    cur.execute(POPULATE_NGRAM_FTS_DML)
+
+    conn.commit()
+
+
+def dropNgramTableClone(conn):
+    cur = conn.cursor()
+
+    cur.execute(DROP_NGRAM_FTS_DML)
+
+    conn.commit()
