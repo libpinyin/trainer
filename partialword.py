@@ -92,3 +92,23 @@ def dropNgramTableClone(conn):
     cur.execute(DROP_NGRAM_FTS_DML)
 
     conn.commit()
+
+
+#from 2-gram.db
+def getPartialWordList(conn, threshold):
+    print(threshold)
+
+    words_list = []
+    sep = config.getWordSep()
+
+    cur = conn.cursor()
+    rows = cur.execute(SELECT_PARTIAL_WORD_DML, (threshold, )).fetchall()
+
+    for row in rows:
+        (words_str, freq) = row
+        (prefix, postfix) = words_str.strip(sep).split(sep, 1)
+        merged_word = prefix + postfix
+        words_list.append((merged_word, prefix, postfix, freq))
+
+    conn.commit()
+    return words_list
