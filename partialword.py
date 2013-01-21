@@ -14,7 +14,6 @@ SELECT words, freq FROM ngram WHERE freq > ?;
 UPDATE_LOW_NGRAM_DML = '''
 UPDATE ngram SET freq = freq + ? WHERE words = ?;
 '''
-#assert rowcount <= 1
 
 INSERT_LOW_NGRAM_DML = '''
 INSERT INTO ngram (words, freq) VALUES (?, ?);
@@ -24,7 +23,6 @@ INSERT INTO ngram (words, freq) VALUES (?, ?);
 DELETE_HIGH_NGRAM_DML = '''
 DELETE FROM ngram WHERE words = ?;
 '''
-#assert rowcount <= 1
 
 
 #sqlite full text search section
@@ -115,7 +113,7 @@ def getPartialWordList(conn, threshold):
     return words_list
 
 
-def getMatchedItems(conn, words):
+def getMatchedItems(cur, words):
     print(words)
     (prefix, postfix) = words
 
@@ -124,12 +122,54 @@ def getMatchedItems(conn, words):
     words_str = '"' + sep + prefix + sep + postfix + sep + '"'
     print(words_str)
 
-    cur = conn.cursor()
     rows = cur.execute(SELECT_MERGE_HIGH_NGRAM_DML, (words_str, )).fetchall()
 
     for row in rows:
         (words, freq) = row
         matched_list.append((words, freq))
 
-    conn.commit()
     return matched_list
+
+
+def doCombineWord(high_cur, low_cur, words):
+    print(words)
+    (prefix, postfix) = words
+
+    sep = config.getWordSep()
+
+    matched_items = getMatchedItems(high_cur, words)
+    words_str = sep + prefix + sep + postfix + sep
+    print(words_str)
+
+    for item in matched_items:
+        (matched_words_str, matched_freq) = item
+        assert words_str in matched_words_str
+        merged_str = sep + prefix + postfix + sep
+
+        (left, middle, right) = matched_words_str.partition(words_str)
+        while middle != '':
+            merged_words_str = left + merged_str + right
+
+            print(matched_words_str), print(merged_words_str)
+            assert len(matched_words_str) == len(merged_words_str) + 1
+
+            #do combine
+            rowcount = low_cur.execute(UPDATE_LOW_NGRAM_DML, \
+                                           (matched_freq, merged_words_str)).rowcount
+            #print(rowcount)
+            assert rowcount <= 1
+
+            if 0 == rowcount:
+                low_cur.execute(INSERT_LOW_NGRAM_DML, \
+                                    (merged_words_str, matched_freq))
+
+                rowcount = high_cur.execute(DELETE_HIGH_NGRAM_DML, \
+                                                (merged_words_str, )).rowcount
+                assert rowcount <= 1
+
+            (partial_left, middle, right) = right.partition(words_str)
+            left = left + middle + partial_left
+
+
+def recognizePartialWord(workdir, threshold):
+    pass
