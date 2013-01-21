@@ -72,8 +72,10 @@ def load_words(filename):
     wordlistfile.close()
 
 
-def createNgramTableClone(conn, threshold):
+def createNgramTableClone(conn):
     print("creating ngram fts table...")
+
+    threshold = config.getNgramMinimumOccurrence()
 
     cur = conn.cursor()
 
@@ -228,7 +230,7 @@ def recognizePartialWord(workdir, threshold):
             low_cur = low_conn.cursor()
 
             dropNgramTableClone(high_conn)
-            createNgramTableClone(high_conn, threshold)
+            createNgramTableClone(high_conn)
 
             for item in partial_words_list:
                 (merged_word, prefix, postfix, freq) = item

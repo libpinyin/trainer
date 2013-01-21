@@ -135,6 +135,9 @@ class MyConfig:
     def getMinimumOccurrence(self):
         return 3 # minimum word occurrence
 
+    def getNgramMinimumOccurrence(self):
+        return 9 # minimum word occurrence in n-gram table
+
     def getPartialWordThreshold(self):
         return 0.10 # the first 10% in position
 
