@@ -15,6 +15,14 @@ CREATE TABLE bigram (
       );
 '''
 
+CREATE_BIGRAM_PREFIX_INDEX_DDL = '''
+CREATE INDEX bigram_prefix_index on bigram(prefix);
+'''
+
+CREATE_BIGRAM_POSTFIX_INDEX_DDL = '''
+CREATE INDEX bigram_postfix_index on bigram(postfix);
+'''
+
 SELECT_ALL_NGRAM_DML = '''
 SELECT words, freq FROM ngram;
 '''
@@ -45,6 +53,8 @@ def createBigramSqlite(indexpath, workdir):
     conn = sqlite3.connect(filepath)
     cur = conn.cursor()
     cur.execute(CREATE_BIGRAM_DDL)
+    cur.execute(CREATE_BIGRAM_PREFIX_INDEX_DDL)
+    cur.execute(CREATE_BIGRAM_POSTFIX_INDEX_DDL)
     conn.commit()
     if conn:
         conn.close()
