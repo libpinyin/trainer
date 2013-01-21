@@ -4,7 +4,7 @@ import sqlite3
 from argparse import ArgumentParser
 import utils
 from myconfig import MyConfig
-
+from dirwalk import walkIndex
 
 SELECT_PARTIAL_WORD_DML = '''
 SELECT words, freq FROM ngram WHERE freq > ?;
@@ -256,7 +256,43 @@ def recognizePartialWord(workdir, threshold):
     print(workdir, 'done')
 
 
-print("loading...")
+def handleOneIndex(indexpath, subdir, indexname):
+    print(indexpath, subdir, indexname)
+
+    indexstatuspath = indexpath + config.getStatusPostfix()
+    indexstatus = utils.load_status(indexstatuspath)
+    if not utils.check_epoch(indexstatus, 'PartialWordThreshold'):
+        raise utils.EpochError \
+            ('Please partial word threshold estimate first.\n')
+    if utils.check_epoch(indexstatus, 'PartialWord'):
+        return
+
+    threshold = indexstatus['PartialWordThreshold']
+
+    workdir = config.getWordRecognizerDir() + os.sep + \
+        subdir + os.sep + indexname
+    print(workdir)
+
+    recognizePartialWord(workdir, threshold)
+
+    #sign epoch
+    utils.sign_epoch(indexstatus, 'PartialWord')
+    utils.store_status(indexstatuspath, indexstatus)
+
+
+print("loading words.txt...")
 load_words(config.getWordsListFileName())
 #print(words_set)
 
+
+if __name__ == '__main__':
+    parser = ArgumentParser(description='Recognize partial words.')
+    parser.add_argument('--indexdir', action='store', \
+                            help='index directory', \
+                            default=config.getTextIndexDir())
+
+
+    args = parser.parse_args()
+    print(args)
+    walkIndex(handleOneIndex, args.indexdir)
+    print('done')
