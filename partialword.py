@@ -72,11 +72,9 @@ def load_words(filename):
     wordlistfile.close()
 
 
-load_words(config.getWordsListFileName())
-#print(words_set)
-
-
 def createNgramTableClone(conn):
+    print("creating ngram fts table...")
+
     cur = conn.cursor()
 
     cur.execute(CREATE_NGRAM_FTS_DDL)
@@ -86,6 +84,7 @@ def createNgramTableClone(conn):
 
 
 def dropNgramTableClone(conn):
+    print("dropping ngram fts table...")
     cur = conn.cursor()
 
     cur.execute(DROP_NGRAM_FTS_DML)
@@ -150,7 +149,7 @@ def doCombineWord(high_cur, low_cur, words):
         while middle != '':
             merged_words_str = left + merged_str + right
 
-            print(matched_words_str), print(merged_words_str)
+            #print(matched_words_str), print(merged_words_str)
             assert len(matched_words_str) == len(merged_words_str) + 1
 
             #do combine
@@ -172,4 +171,77 @@ def doCombineWord(high_cur, low_cur, words):
 
 
 def recognizePartialWord(workdir, threshold):
-    pass
+    print(workdir, threshold)
+
+    iternum = 0
+    maxIter = config.getMaximumIteration()
+
+    filename = config.getPartialWordFileName()
+    filepath = workdir + os.sep + filename
+    partialwordfile = open(filepath, "w")
+
+    while iternum < maxIter :
+        print("pass ", iternum)
+
+        length = 2
+        filename = config.getNgramFileName(length)
+        filepath = workdir + os.sep + filename
+
+        conn = sqlite3.connect(filepath)
+        partial_words_list = getPartialWordList(conn, threshold)
+        conn.close()
+
+        changed_num = 0
+        for item in partial_words_list:
+            (merged_word, prefix, postfix, freq) = item
+            if merged_word in words_set :
+                continue
+            changed_num = changed_num + 1
+
+        if 0 == changed_num:
+            break;
+
+        for item in partial_words_list:
+            item = [str(x) for x in item]
+            oneline = "\t".join(item)
+            partialwordfile.writelines([oneline, os.linesep])
+
+        for i in range(N, 1, -1):
+            #high n-gram
+            filename = config.getNgramFileName(i)
+            filepath = workdir + os.sep + filename
+            high_conn = sqlite3.connect(filepath)
+            high_cur = high_conn.cursor()
+
+            #low n-gram
+            filename = config.getNgramFileName(i - 1)
+            filepath = workdir + os.sep + filename
+            low_conn = sqlite3.connect(filepath)
+            low_cur = low_conn.cursor()
+
+            dropNgramTableClone(high_conn)
+            createNgramTableClone(high_conn)
+
+            for item in partial_words_list:
+                (merged_word, prefix, postfix, freq) = item
+                if merged_word in words_set :
+                    continue
+                doCombineWord(high_cur, low_cur, (prefix, postfix))
+
+            high_conn.commit()
+            low_conn.commit()
+
+            dropNgramTableClone(high_conn)
+
+            high_conn.close()
+            low_conn.close()
+
+        iternum = iternum + 1
+
+    partialwordfile.close()
+    print(workdir, 'done')
+
+
+load_words(config.getWordsListFileName())
+#print(words_set)
+

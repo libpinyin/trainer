@@ -152,3 +152,6 @@ class MyConfig:
 
     def getWordsWithPinyinFileName(self):
         return "oldwords.txt"
+
+    def getPartialWordFileName(self):
+        return "partialword.txt"
