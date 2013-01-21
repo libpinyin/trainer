@@ -10,13 +10,14 @@ SELECT_PARTIAL_WORD_DML = '''
 SELECT words, freq FROM ngram WHERE freq > ?;
 '''
 
-#try insert first
-INSERT_LOW_NGRAM_DML = '''
-INSERT INTO ngram (words, freq) VALUES (?, ?);
-'''
-
+#try update first to get affected row count
 UPDATE_LOW_NGRAM_DML = '''
 UPDATE ngram SET freq = freq + ? WHERE words = ?;
+'''
+#assert rowcount <= 1
+
+INSERT_LOW_NGRAM_DML = '''
+INSERT INTO ngram (words, freq) VALUES (?, ?);
 '''
 
 #try delete last
@@ -112,3 +113,23 @@ def getPartialWordList(conn, threshold):
 
     conn.commit()
     return words_list
+
+
+def getMatchedItems(conn, words):
+    print(words)
+    (prefix, postfix) = words
+
+    matched_list = []
+    sep = config.getWordSep()
+    words_str = '"' + sep + prefix + sep + postfix + sep + '"'
+    print(words_str)
+
+    cur = conn.cursor()
+    rows = cur.execute(SELECT_MERGE_HIGH_NGRAM_DML, (words_str, )).fetchall()
+
+    for row in rows:
+        (words, freq) = row
+        matched_list.append((words, freq))
+
+    conn.commit()
+    return matched_list

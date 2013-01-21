@@ -74,6 +74,8 @@ def handleOneDocument(infile, conn, length):
 
         rowcount = cur.execute(UPDATE_NGRAM_DML, (words_str,)).rowcount
         #print(rowcount)
+        assert rowcount <= 1
+
         if 0 == rowcount:
             cur.execute(INSERT_NGRAM_DML, (words_str,))
 
