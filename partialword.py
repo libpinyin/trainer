@@ -31,7 +31,7 @@ CREATE VIRTUAL TABLE ngram_fts USING fts3 (words TEXT NOT NULL, freq INTEGER NOT
 '''
 
 POPULATE_NGRAM_FTS_DML = '''
-INSERT INTO ngram_fts (words, freq) SELECT words, freq FROM ngram;
+INSERT INTO ngram_fts (words, freq) SELECT words, freq FROM ngram WHERE freq > ?;
 '''
 
 DROP_NGRAM_FTS_DML = '''
@@ -72,13 +72,13 @@ def load_words(filename):
     wordlistfile.close()
 
 
-def createNgramTableClone(conn):
+def createNgramTableClone(conn, threshold):
     print("creating ngram fts table...")
 
     cur = conn.cursor()
 
     cur.execute(CREATE_NGRAM_FTS_DDL)
-    cur.execute(POPULATE_NGRAM_FTS_DML)
+    cur.execute(POPULATE_NGRAM_FTS_DML, (threshold, ))
 
     conn.commit()
 
@@ -94,7 +94,7 @@ def dropNgramTableClone(conn):
 
 #from 2-gram.db
 def getPartialWordList(conn, threshold):
-    print(threshold)
+    #print(threshold)
 
     words_list = []
     sep = config.getWordSep()
@@ -113,13 +113,13 @@ def getPartialWordList(conn, threshold):
 
 
 def getMatchedItems(cur, words):
-    print(words)
+    #print(words)
     (prefix, postfix) = words
 
     matched_list = []
     sep = config.getWordSep()
     words_str = '"' + sep + prefix + sep + postfix + sep + '"'
-    print(words_str)
+    #print(words_str)
 
     rows = cur.execute(SELECT_MERGE_HIGH_NGRAM_DML, (words_str, )).fetchall()
 
@@ -131,14 +131,14 @@ def getMatchedItems(cur, words):
 
 
 def doCombineWord(high_cur, low_cur, words):
-    print(words)
+    #print(words)
     (prefix, postfix) = words
 
     sep = config.getWordSep()
 
     matched_items = getMatchedItems(high_cur, words)
     words_str = sep + prefix + sep + postfix + sep
-    print(words_str)
+    #print(words_str)
 
     for item in matched_items:
         (matched_words_str, matched_freq) = item
@@ -176,6 +176,8 @@ def recognizePartialWord(workdir, threshold):
     iternum = 0
     maxIter = config.getMaximumIteration()
 
+    bigram_set = set([])
+
     filename = config.getPartialWordFileName()
     filepath = workdir + os.sep + filename
     partialwordfile = open(filepath, "w")
@@ -196,14 +198,20 @@ def recognizePartialWord(workdir, threshold):
             (merged_word, prefix, postfix, freq) = item
             if merged_word in words_set :
                 continue
+            if (prefix, postfix) in bigram_set:
+                continue
             changed_num = changed_num + 1
 
         if 0 == changed_num:
             break;
 
         for item in partial_words_list:
-            item = [str(x) for x in item]
-            oneline = "\t".join(item)
+            (merged_word, prefix, postfix, freq) = item
+            if merged_word in words_set:
+                continue
+            if (prefix, postfix) in bigram_set:
+                continue
+            oneline = "\t".join((merged_word, prefix, postfix, str(freq)))
             partialwordfile.writelines([oneline, os.linesep])
 
         for i in range(N, 1, -1):
@@ -220,21 +228,27 @@ def recognizePartialWord(workdir, threshold):
             low_cur = low_conn.cursor()
 
             dropNgramTableClone(high_conn)
-            createNgramTableClone(high_conn)
+            createNgramTableClone(high_conn, threshold)
 
             for item in partial_words_list:
                 (merged_word, prefix, postfix, freq) = item
+
                 if merged_word in words_set :
                     continue
+
+                if (prefix, postfix) in bigram_set:
+                    continue
+
+                print(merged_word, prefix, postfix, freq, i)
                 doCombineWord(high_cur, low_cur, (prefix, postfix))
 
-            high_conn.commit()
-            low_conn.commit()
-
+            high_conn.commit(), low_conn.commit()
             dropNgramTableClone(high_conn)
+            high_conn.close(), low_conn.close()
 
-            high_conn.close()
-            low_conn.close()
+        for item in partial_words_list:
+            (merged_word, prefix, postfix, freq) = item
+            bigram_set.add((prefix, postfix))
 
         iternum = iternum + 1
 
@@ -242,6 +256,7 @@ def recognizePartialWord(workdir, threshold):
     print(workdir, 'done')
 
 
+print("loading...")
 load_words(config.getWordsListFileName())
 #print(words_set)
 
