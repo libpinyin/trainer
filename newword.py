@@ -7,6 +7,20 @@ import utils
 from myconfig import MyConfig
 from dirwalk import walkIndex
 
+
+config = MyConfig()
+
+#change cwd to the word recognizer directory
+words_dir = config.getWordRecognizerDir()
+os.chdir(words_dir)
+#chdir done
+
+
+############################################################
+#                Create Bigram Database                    #
+############################################################
+
+
 CREATE_BIGRAM_DDL = '''
 CREATE TABLE bigram (
       prefix TEXT NOT NULL,
@@ -32,16 +46,8 @@ INSERT INTO bigram(prefix, postfix, freq) VALUES (?, ?, ?);
 '''
 
 
-config = MyConfig()
-
-#change cwd to the word recognizer directory
-words_dir = config.getWordRecognizerDir()
-os.chdir(words_dir)
-#chdir done
-
-
-def createBigramSqlite(indexpath, workdir):
-    print(indexpath, workdir, 'create bigram')
+def createBigramSqlite(workdir):
+    print(workdir, 'create bigram')
 
     filename = config.getBigramFileName()
     filepath = workdir + os.sep + filename
@@ -60,8 +66,8 @@ def createBigramSqlite(indexpath, workdir):
         conn.close()
 
 
-def handleBigramPass(indexpath, workdir):
-    print(indexpath, workdir, 'bigram pass')
+def populateBigramSqlite(workdir):
+    print(workdir, 'populate bigram')
 
     sep = config.getWordSep()
 
@@ -100,35 +106,11 @@ def handleBigramPass(indexpath, workdir):
         ngram_conn.close()
 
 
-def handleOneIndex(indexpath, subdir, indexname):
-    print(indexpath, subdir, indexname)
-
-    indexstatuspath = indexpath + config.getStatusPostfix()
-    indexstatus = utils.load_status(indexstatuspath)
-    if not utils.check_epoch(indexstatus, 'PartialWord'):
-        raise utils.EpochError('Please do partial word first.\n')
-    if utils.check_epoch(indexstatus, 'PopulateBigram'):
-        return
-
-    workdir = config.getWordRecognizerDir() + os.sep + \
-        subdir + os.sep + indexname
-    print(workdir)
-
-    createBigramSqlite(indexpath, workdir)
-    handleBigramPass(indexpath, workdir)
-
-    #sign epoch
-    utils.sign_epoch(indexstatus, 'PopulateBigram')
-    utils.store_status(indexstatuspath, indexstatus)
+############################################################
+#                Get Threshold Pass                        #
+############################################################
 
 
-if __name__ == '__main__':
-    parser = ArgumentParser(description='Populate bi-gram.')
-    parser.add_argument('--indexdir', action='store', \
-                            help='index directory', \
-                            default=config.getTextIndexDir())
-
-    args = parser.parse_args()
-    print(args)
-    walkIndex(handleOneIndex, args.indexdir)
-    print('done')
+############################################################
+#                  Get Word Pass                           #
+############################################################
