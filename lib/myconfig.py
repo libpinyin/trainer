@@ -13,7 +13,7 @@ class MyConfig:
                            'PopulateEpoch': 3, \
                            'PartialWordThresholdEpoch': 4, \
                            'PartialWordEpoch': 5, \
-                           'PopulateBigramEpoch': 6, \
+                           'NewWordEpoch': 6, \
                            }
 
     def getEpochs(self):
@@ -132,7 +132,7 @@ class MyConfig:
         assert N >= 2, 'at least bi-gram'
         return N
 
-    def getPruneMinimumOccurence(self):
+    def getPruneMinimumOccurrence(self):
         return 1 # prune minimum occurrence
 
     def getWordMinimumOccurrence(self):
