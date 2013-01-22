@@ -16,6 +16,9 @@ UPDATE_NGRAM_DML = '''
 UPDATE ngram SET freq = freq + 1 WHERE words = ?;
 '''
 
+PRUNE_NGRAM_DML = '''
+DELETE FROM ngram WHERE freq <= ?;
+'''
 
 config = MyConfig()
 
@@ -28,7 +31,7 @@ os.chdir(words_dir)
 #chdir done
 
 
-def handleOneDocument(infile, conn, length):
+def handleOneDocument(infile, cur, length):
     print(infile, length)
 
     infilestatuspath = infile + config.getStatusPostfix()
@@ -43,8 +46,6 @@ def handleOneDocument(infile, conn, length):
     #train
     docfile = open(infile + config.getSegmentPostfix(), 'r')
     words = []
-
-    cur = conn.cursor()
 
     for oneline in docfile.readlines():
         oneline = oneline.rstrip(os.linesep)
@@ -95,6 +96,7 @@ def handleOnePass(indexpath, workdir, length):
     filepath = workdir + os.sep + filename
 
     conn = sqlite3.connect(filepath)
+    cur = conn.cursor()
 
     #begin processing
     indexfile = open(indexpath, 'r')
@@ -109,12 +111,31 @@ def handleOnePass(indexpath, workdir, length):
             continue
 
         #process one document
-        handleOneDocument(infile, conn, length)
+        handleOneDocument(infile, cur, length)
 
     indexfile.close()
 
     conn.commit()
 
+    if conn:
+        conn.close()
+
+
+def pruneNgramTable(indexpath, workdir, length):
+    print(indexpath, workdir, length, 'prune')
+
+    threshold = config.getPruneMinimumOccurrence()
+
+    filename = config.getNgramFileName(length)
+    filepath = workdir + os.sep + filename
+
+    conn = sqlite3.connect(filepath)
+    cur = conn.cursor()
+
+    rowcount = cur.execute(PRUNE_NGRAM_DML, (threshold, )).rowcount
+    #print(rowcount)
+
+    conn.commit()
     if conn:
         conn.close()
 
@@ -143,9 +164,11 @@ def handleOneIndex(indexpath, subdir, indexname, fast):
             shmfilepath = shmdir + os.sep + filename
             utils.copyfile(filepath, shmfilepath)
             handleOnePass(indexpath, shmdir, i)
+            pruneNgramTable(indexpath, shmdir, i)
             utils.copyfile(shmfilepath, filepath)
             os.unlink(shmfilepath)
         else:
+            handleOnePass(indexpath, workdir, i)
             handleOnePass(indexpath, workdir, i)
 
     #sign epoch

@@ -47,7 +47,7 @@ def computeThreshold(conn):
 
         freq = getWordFrequency(conn, word)
 
-        if freq < config.getMinimumOccurrence():
+        if freq < config.getWordMinimumOccurrence():
             continue
 
         wordswithfreq.append((word, freq))

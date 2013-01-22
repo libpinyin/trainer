@@ -132,7 +132,10 @@ class MyConfig:
         assert N >= 2, 'at least bi-gram'
         return N
 
-    def getMinimumOccurrence(self):
+    def getPruneMinimumOccurence(self):
+        return 1 # prune minimum occurrence
+
+    def getWordMinimumOccurrence(self):
         return 3 # minimum word occurrence
 
     def getNgramMinimumOccurrence(self):
