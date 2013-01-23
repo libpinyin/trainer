@@ -123,6 +123,45 @@ def computeEntropy(freqs):
     return entropy
 
 
+SELECT_PREFIX_DML = '''
+SELECT prefix, freq FROM bigram WHERE postfix = ? ;
+'''
+
+SELECT_POSTFIX_DML = '''
+SELECT postfix, freq FROM bigram WHERE prefix = ? ;
+'''
+
+
+def computePrefixEntropy(cur, word):
+    print('prefix', word)
+
+    rows = cur.execute(SELECT_PREFIX_DML, (word, )).fetchall()
+    if 0 == len(rows):
+        return 0.
+
+    freqs = []
+    for row in rows:
+        (prefix, freq) = row
+        assert freq >= 1
+        freqs.append(freq)
+
+    return computeEntropy(freqs)
+
+
+def computePostfixEntropy(cur, word):
+    print('postfix', word)
+
+    rows = cur.execute(SELECT_POSTFIX_DML, (word, )).fetchall()
+    if 0 == len(rows):
+        return 0.
+
+    freqs = []
+    for row in rows:
+        (postfix, freq) = row
+        assert freq >= 1
+        freqs.append(freq)
+
+    return computeEntropy(freqs)
 
 
 ############################################################
