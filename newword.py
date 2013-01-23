@@ -1,8 +1,9 @@
-#!/usr/bin/sqlite3
+#!/usr/bin/python3
 import os
 import os.path
 import sqlite3
 from argparse import ArgumentParser
+from math import log
 import utils
 from myconfig import MyConfig
 from dirwalk import walkIndex
@@ -104,6 +105,24 @@ def populateBigramSqlite(workdir):
         bigram_conn.close()
     if ngram_conn:
         ngram_conn.close()
+
+
+############################################################
+#             Information Entropy Model                    #
+############################################################
+
+def computeEntropy(freqs):
+    print(freqs)
+
+    totalfreq = sum(freqs)
+    freqs = [ freq / float(totalfreq) for freq in freqs ]
+    assert 1 == sum(freqs)
+
+    entropy = sum([ - freq * log(freq) for freq in freqs ])
+    print(entropy)
+    return entropy
+
+
 
 
 ############################################################
