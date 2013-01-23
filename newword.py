@@ -216,11 +216,11 @@ def filterPartialWord(workdir, conn, prethres, postthres):
     words_set = set([])
     cur = conn.cursor()
 
-    filename = workdir + os.sep + config.getPartialWordFileName()
-    partialwordfile = open(filename, "r")
+    filepath = workdir + os.sep + config.getPartialWordFileName()
+    partialwordfile = open(filepath, "r")
 
-    filename = workdir + os.sep + config.getNewWordFileName()
-    newwordfile = open(filename, "w")
+    filepath = workdir + os.sep + config.getNewWordFileName()
+    newwordfile = open(filepath, "w")
 
     for oneline in partialwordfile.readlines():
         oneline = oneline.rstrip(os.linesep)
