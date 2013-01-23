@@ -267,10 +267,13 @@ def handleOneIndex(indexpath, subdir, indexname):
         subdir + os.sep + indexname
     print(workdir)
 
+    createBigramSqlite(workdir)
+    populateBigramSqlite(workdir)
+
     filename = config.getBigramFileName()
     filepath = workdir + os.sep + filename
 
-    conn = sqlite3.connect(filename)
+    conn = sqlite3.connect(filepath)
 
     prethres = computeThreshold(conn, "prefix")
     indexstatus['NewWordPrefixThreshold'] = prethres
@@ -286,5 +289,18 @@ def handleOneIndex(indexpath, subdir, indexname):
         conn.close()
 
     #sign epoch
-    utils.sign_epoch(indexstatus, 'NewWordThreshold')
+    utils.sign_epoch(indexstatus, 'NewWord')
     utils.store_status(indexstatuspath, indexstatus)
+
+
+if __name__ == '__main__':
+    parser = ArgumentParser(description='Recognizer new words.')
+    parser.add_argument('--indexdir', action='store', \
+                            help='index directory', \
+                            default=config.getTextIndexDir())
+
+
+    args = parser.parse_args()
+    print(args)
+    walkIndex(handleOneIndex, args.indexdir)
+    print('done')
