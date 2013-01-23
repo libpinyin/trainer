@@ -167,7 +167,9 @@ def computePostfixEntropy(cur, word):
     return computeEntropy(freqs)
 
 
-def computeThreshold(cur, tag):
+def computeThreshold(conn, tag):
+    cur = conn.cursor()
+
     wordswithentropy = []
     wordlistfile = open(config.getWordsListFileName(), "r")
 
@@ -196,14 +198,93 @@ def computeThreshold(cur, tag):
 
     wordlistfile.close()
 
+    conn.commit()
+
     #ascending sort
     wordswithentropy.sort(key=itemgetter(1))
     pos = int(len(wordswithentropy) * config.getNewWordThreshold())
     (word, threshold) = wordswithentropy[-pos]
-    print(word, threshold)
+    print(word, tag, threshold)
     return threshold
 
 
 ############################################################
 #                  Get Word Pass                           #
 ############################################################
+
+def filterPartialWord(workdir, conn, prethres, postthres):
+    words_set = set([])
+    cur = conn.cursor()
+
+    filename = workdir + os.sep + config.getPartialWordFileName()
+    partialwordfile = open(filename, "r")
+
+    filename = workdir + os.sep + config.getNewWordFileName()
+    newwordfile = open(filename, "w")
+
+    for oneline in partialwordfile.readlines():
+        oneline = oneline.rstrip(os.linesep)
+
+        if len(oneline) == 0:
+            continue
+
+        (word, prefix, postfix, freq) = oneline.split(None, 3)
+
+        if word in words_set:
+            continue
+
+        entropy = computePrefixEntropy(cur, word)
+        if entropy < prethres:
+            continue
+        entropy = computePostfixEntropy(cur, word)
+        if entropy < postthres:
+            continue
+
+        print(word)
+        newwordfile.writelines([word, os.linesep])
+        words_set.add(word)
+
+    newwordfile.close()
+    partialwordfile.close()
+    conn.commit()
+
+
+############################################################
+#                  Handle Index                            #
+############################################################
+
+def handleOneIndex(indexpath, subdir, indexname):
+    print(indexpath, subdir, indexname)
+
+    indexstatuspath = indexpath + config.getStatusPostfix()
+    indexstatus = utils.load_status(indexstatuspath)
+    if not utils.check_epoch(indexstatus, 'PartialWord'):
+        raise utils.EpochError('Please partial word first.\n')
+    if utils.check_epoch(indexstatus, 'NewWord'):
+        return
+
+    workdir = config.getWordRecognizerDir() + os.sep + \
+        subdir + os.sep + indexname
+    print(workdir)
+
+    filename = config.getBigramFileName()
+    filepath = workdir + os.sep + filename
+
+    conn = sqlite3.connect(filename)
+
+    prethres = computeThreshold(conn, "prefix")
+    indexstatus['NewWordPrefixThreshold'] = prethres
+    postthres = computeThreshold(conn, "postfix")
+    indexstatus['NewWordPostfixThreshold'] = postthres
+
+    utils.store_status(indexstatuspath, indexstatus)
+
+    filterPartialWord(workdir, conn, prethres, postthres)
+
+    conn.commit()
+    if conn:
+        conn.close()
+
+    #sign epoch
+    utils.sign_epoch(indexstatus, 'NewWordThreshold')
+    utils.store_status(indexstatuspath, indexstatus)
