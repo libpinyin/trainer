@@ -147,6 +147,9 @@ class MyConfig:
     def getNewWordThreshold(self):
         return 0.10 / 2 # the first 5% in position
 
+    def getMinimumEntropy(self):
+        return 1.
+
     def getMaximumIteration(self):
         return 20 # roughly around N
 
@@ -161,3 +164,6 @@ class MyConfig:
 
     def getPartialWordFileName(self):
         return "partialword.txt"
+
+    def getNewWordFileName(self):
+        return "newword.txt"

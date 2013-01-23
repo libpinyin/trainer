@@ -3,7 +3,9 @@ import os
 import os.path
 import sqlite3
 from argparse import ArgumentParser
+from operator import itemgetter
 from math import log
+from sys import float_info
 import utils
 from myconfig import MyConfig
 from dirwalk import walkIndex
@@ -112,15 +114,19 @@ def populateBigramSqlite(workdir):
 ############################################################
 
 def computeEntropy(freqs):
-    print(freqs)
+    #print(freqs)
 
     totalfreq = sum(freqs)
     freqs = [ freq / float(totalfreq) for freq in freqs ]
-    assert 1 == sum(freqs)
+    assert abs(1 - sum(freqs)) < len(freqs) * float_info.epsilon
 
-    entropy = sum([ - freq * log(freq) for freq in freqs ])
-    print(entropy)
+    entropy = - sum([ freq * log(freq) for freq in freqs ])
     return entropy
+
+
+############################################################
+#                Get Threshold Pass                        #
+############################################################
 
 
 SELECT_PREFIX_DML = '''
@@ -133,8 +139,6 @@ SELECT postfix, freq FROM bigram WHERE prefix = ? ;
 
 
 def computePrefixEntropy(cur, word):
-    print('prefix', word)
-
     rows = cur.execute(SELECT_PREFIX_DML, (word, )).fetchall()
     if 0 == len(rows):
         return 0.
@@ -149,7 +153,6 @@ def computePrefixEntropy(cur, word):
 
 
 def computePostfixEntropy(cur, word):
-    print('postfix', word)
 
     rows = cur.execute(SELECT_POSTFIX_DML, (word, )).fetchall()
     if 0 == len(rows):
@@ -164,9 +167,41 @@ def computePostfixEntropy(cur, word):
     return computeEntropy(freqs)
 
 
-############################################################
-#                Get Threshold Pass                        #
-############################################################
+def computeThreshold(cur, tag):
+    wordswithentropy = []
+    wordlistfile = open(config.getWordsListFileName(), "r")
+
+    for oneline in wordlistfile.readlines():
+        oneline = oneline.rstrip(os.linesep)
+
+        if len(oneline) == 0:
+            continue
+
+        word = oneline
+
+        entropy = 0.
+        if "prefix" == tag:
+            entropy = computePrefixEntropy(cur, word)
+        elif "postfix" == tag:
+            entropy = computePostfixEntropy(cur, word)
+        else:
+            raise "invalid tag value."
+
+        #print(word, entropy)
+
+        if entropy < config.getMinimumEntropy():
+            continue
+
+        wordswithentropy.append((word, entropy))
+
+    wordlistfile.close()
+
+    #ascending sort
+    wordswithentropy.sort(key=itemgetter(1))
+    pos = int(len(wordswithentropy) * config.getNewWordThreshold())
+    (word, threshold) = wordswithentropy[-pos]
+    print(word, threshold)
+    return threshold
 
 
 ############################################################
