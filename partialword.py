@@ -2,9 +2,90 @@
 import os
 import sqlite3
 from argparse import ArgumentParser
+from operator import itemgetter
 import utils
 from myconfig import MyConfig
 from dirwalk import walkIndex
+
+config = MyConfig()
+
+#change cwd to the word recognizer directory
+words_dir = config.getWordRecognizerDir()
+os.chdir(words_dir)
+#chdir done
+
+############################################################
+#                     Get Threshold                        #
+############################################################
+
+SELECT_WORD_DML = '''
+SELECT freq from ngram where words = ?;
+'''
+
+def getWordFrequency(conn, word):
+    sep = config.getWordSep()
+    word_str = sep + word + sep
+
+    cur = conn.cursor()
+    row = cur.execute(SELECT_WORD_DML, (word_str, )).fetchone()
+
+    if None == row:
+        return 0
+    else:
+        freq = row[0]
+        return freq
+
+
+def computeThreshold(conn):
+    wordswithfreq = []
+    wordlistfile = open(config.getWordsListFileName(), "r")
+
+    for oneline in wordlistfile.readlines():
+        oneline = oneline.rstrip(os.linesep)
+
+        if len(oneline) == 0:
+            continue
+
+        word = oneline
+
+        freq = getWordFrequency(conn, word)
+
+        if freq < config.getWordMinimumOccurrence():
+            continue
+
+        wordswithfreq.append((word, freq))
+
+    wordlistfile.close()
+
+    #ascending sort
+    wordswithfreq.sort(key=itemgetter(1))
+    pos = int(len(wordswithfreq) * config.getPartialWordThreshold())
+    (word, threshold) = wordswithfreq[-pos]
+    print(word, threshold)
+    return threshold
+
+
+def getThreshold(workdir):
+    print(workdir, 'threshold')
+
+    length = 1
+    filename = config.getNgramFileName(length)
+    filepath = workdir + os.sep + filename
+
+    conn = sqlite3.connect(filepath)
+
+    threshold = computeThreshold(conn)
+
+    conn.commit()
+    if conn:
+        conn.close()
+
+    return threshold
+
+
+############################################################
+#                   Get Partial Word                       #
+############################################################
 
 SELECT_PARTIAL_WORD_DML = '''
 SELECT words, freq FROM ngram WHERE freq > ?;
@@ -42,15 +123,8 @@ SELECT_MERGE_HIGH_NGRAM_DML = '''
 SELECT words, freq FROM ngram_fts WHERE words MATCH ?;
 '''
 
-config = MyConfig()
-
 #maximum combine number
 N = config.getMaximumCombineNumber()
-
-#change cwd to the word recognizer directory
-words_dir = config.getWordRecognizerDir()
-os.chdir(words_dir)
-#chdir done
 
 
 #load existing words
@@ -263,17 +337,18 @@ def handleOneIndex(indexpath, subdir, indexname):
 
     indexstatuspath = indexpath + config.getStatusPostfix()
     indexstatus = utils.load_status(indexstatuspath)
-    if not utils.check_epoch(indexstatus, 'PartialWordThreshold'):
-        raise utils.EpochError \
-            ('Please partial word threshold estimate first.\n')
+    if not utils.check_epoch(indexstatus, 'Populate'):
+        raise utils.EpochError('Please populate first.\n')
     if utils.check_epoch(indexstatus, 'PartialWord'):
         return
-
-    threshold = indexstatus['PartialWordThreshold']
 
     workdir = config.getWordRecognizerDir() + os.sep + \
         subdir + os.sep + indexname
     print(workdir)
+
+    threshold = getThreshold(workdir)
+    indexstatus['PartialWordThreshold'] = threshold
+    utils.store_status(indexstatuspath, indexstatus)
 
     recognizePartialWord(workdir, threshold)
 
