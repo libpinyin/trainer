@@ -14,6 +14,7 @@ class MyConfig:
                            'PartialWordThresholdEpoch': 4, \
                            'PartialWordEpoch': 5, \
                            'NewWordEpoch': 6, \
+                           'MarkPinyinEpoch': 7, \
                            }
 
     def getEpochs(self):
@@ -167,3 +168,6 @@ class MyConfig:
 
     def getNewWordFileName(self):
         return "newword.txt"
+
+    def getRecognizedWordFileName(self):
+        return "recognized.txt"
