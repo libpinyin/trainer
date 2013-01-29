@@ -129,7 +129,42 @@ def markPinyin(word):
         assert False, "missed word.\n"
 
 
+def markPinyins(workdir):
+    print(workdir)
+
+    merged_words_dict = {}
+
+    filename = config.getPartialWordFileName()
+    filepath = workdir + os.sep + filename
+    load_merged_words(filepath)
+
+    filename = config.getNewWordFileName()
+    filepath = workdir + os.sep + filename
+    newwordfile = open(filepath, "r")
+
+    filename = config.getRecognizedWordFileName()
+    filepath = workdir + os.sep + filename
+    recordfile = open(filepath, "w")
+
+    for oneline in newwordfile.readlines():
+        oneline = oneline.rstrip(os.linesep)
+
+        if len(oneline) == 0:
+            continue
+
+        word = oneline
+
+        pinyin_list = markPinyin(word)
+
+        for pinyin, freq in pinyin_list:
+            freq = str(freq)
+            oneline = '\t'.join((word, pinyin, freq))
+            recordfile.writelines([oneline, os.linesep])
+
+    recordfile.close()
+    newwordfile.close()
+
+
 #loading old words
 load_atomic_words(config.getWordsWithPinyinFileName())
 #print(atomic_words_dict)
-
