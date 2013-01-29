@@ -81,7 +81,7 @@ def mergePinyin(pinyin_list):
         freq = default * freq / total_freq
         freq = int(freq)
         if freq < minimum:
-            freq = minimum
+            continue
         results.append((pinyin, freq))
     print(results)
     return results
@@ -130,8 +130,6 @@ def markPinyin(word):
 
 
 def markPinyins(workdir):
-    print(workdir)
-
     merged_words_dict = {}
 
     filename = config.getPartialWordFileName()
@@ -165,6 +163,40 @@ def markPinyins(workdir):
     newwordfile.close()
 
 
+def handleOneIndex(indexpath, subdir, indexname):
+    print(indexpath, subdir, indexname)
+
+    indexstatuspath = indexpath + config.getStatusPostfix()
+    indexstatus = utils.load_status(indexstatuspath)
+    if not utils.check_epoch(indexstatus, 'NewWord'):
+        raise utils.EpochError('Please new word first.\n')
+    if utils.check_epoch(indexstatus, 'MarkPinyin'):
+        return
+
+    workdir = config.getWordRecognizerDir() + os.sep + \
+        subdir + os.sep + indexname
+    print(workdir)
+
+    markPinyins(workdir)
+
+    #sign epoch
+    utils.sign_epoch(indexstatus, 'MarkPinyin')
+    utils.store_status(indexstatuspath, indexstatus)
+
+
 #loading old words
 load_atomic_words(config.getWordsWithPinyinFileName())
 #print(atomic_words_dict)
+
+
+if __name__ == '__main__':
+    parser = ArgumentParser(description='Mark pinyins.')
+    parser.add_argument('--indexdir', action='store', \
+                            help='index directory', \
+                            default=config.getTextIndexDir())
+
+
+    args = parser.parse_args()
+    print(args)
+    walkIndex(handleOneIndex, args.indexdir)
+    print('done')

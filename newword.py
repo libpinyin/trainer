@@ -294,7 +294,7 @@ def handleOneIndex(indexpath, subdir, indexname):
 
 
 if __name__ == '__main__':
-    parser = ArgumentParser(description='Recognizer new words.')
+    parser = ArgumentParser(description='Recognize new words.')
     parser.add_argument('--indexdir', action='store', \
                             help='index directory', \
                             default=config.getTextIndexDir())
