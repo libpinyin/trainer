@@ -171,3 +171,9 @@ class MyConfig:
 
     def getRecognizedWordFileName(self):
         return "recognized.txt"
+
+    def getDefaultPinyinTotalFrequency(self):
+        return 100
+
+    def getMinimumPinyinFrequency(self):
+        return 3

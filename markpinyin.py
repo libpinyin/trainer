@@ -2,7 +2,6 @@
 import os
 import sqlite3
 from argparse import ArgumentParser
-from operator import itemgetter
 import utils
 from myconfig import MyConfig
 from dirwalk import walkIndex
@@ -10,14 +9,20 @@ from dirwalk import walkIndex
 
 config = MyConfig()
 
+#default pinyin total frequency
+default = config.getDefaultPinyinTotalFrequency()
+
+#minimum pinyin frequency
+minimum = config.getMinimumPinyinFrequency()
+
 #change cwd to the word recognizer directory
 words_dir = config.getWordRecognizerDir()
 os.chdir(words_dir)
 #chdir done
 
 
-atomic_words_list = []
-merged_words_list = []
+atomic_words_dict = {}
+merged_words_dict = {}
 
 
 def load_atomic_words(filename):
@@ -31,11 +36,12 @@ def load_atomic_words(filename):
         (word, pinyin, freq) = oneline.split(None, 2)
         freq = int(freq)
 
-        atomic_words_list.append((word, pinyin, freq))
+        if word in atomic_words_dict:
+            atomic_words_dict[word].append((pinyin, freq))
+        else:
+            atomic_words_dict[word] = [(pinyin, freq)]
 
     wordsfile.close()
-    #ascending sort
-    atomic_words_list.sort(key=itemgetter(0, 1))
 
 
 def load_merged_words(filename):
@@ -49,14 +55,81 @@ def load_merged_words(filename):
         (word, prefix, postfix, freq) = oneline.split(None, 3)
         freq = int(freq)
 
-        merged_words_list.append((word, prefix, postfix, freq))
+        if word in merged_words_dict:
+            merged_words_dict[word].append((prefix, postfix, freq))
+        else:
+            merged_words_dict[word] = [(prefix, postfix, freq)]
 
     wordsfile.close()
 
-    #ascending sort
-    merged_words_list.sort(key=itemgetter(0, 1, 2))
+
+def mergePinyin(pinyin_list):
+    print(pinyin_list)
+    pinyins = {}
+
+    for (pinyin, freq) in pinyin_list:
+        if pinyin in pinyins:
+            pinyins[pinyin] += freq
+        else:
+            pinyins[pinyin] = freq
+
+    pinyins = list(pinyins.items())
+    total_freq = sum([ freq for pinyin, freq in pinyins ])
+
+    results = []
+    for (pinyin, freq) in pinyins:
+        freq = default * freq / total_freq
+        freq = int(freq)
+        if freq < minimum:
+            freq = minimum
+        results.append((pinyin, freq))
+    print(results)
+    return results
+
+
+def markAtomicWord(word):
+    assert word in atomic_words_dict
+    results = atomic_words_dict[word]
+    return mergePinyin(results)
+
+
+def markMergedWord(word):
+    assert word in merged_words_dict
+
+    merged_list = merged_words_dict[word]
+    print(merged_list)
+    merged_sum = sum([ freq for prefix, postfix, freq in merged_list ])
+
+    results = []
+    for (prefix, postfix, freq) in merged_list:
+        prefix_list = markPinyin(prefix)
+        prefix_sum = sum([ freq for pinyin, freq in prefix_list ])
+
+        postfix_list = markPinyin(postfix)
+        postfix_sum = sum([ freq for pinyin, freq in postfix_list ])
+
+        for prefix_pinyin, prefix_freq in prefix_list:
+            for postfix_pinyin, postfix_freq in postfix_list:
+                merged_pinyin = prefix_pinyin + "'" + postfix_pinyin
+                merged_freq = default * freq * prefix_freq * postfix_freq / \
+                    merged_sum / prefix_sum / postfix_sum
+                results.append((merged_pinyin, merged_freq))
+
+    return mergePinyin(results)
+
+
+def markPinyin(word):
+    print(word)
+
+    if word in atomic_words_dict:
+        return markAtomicWord(word)
+    elif word in merged_words_dict:
+        return markMergedWord(word)
+    else:
+        assert False, "missed word.\n"
 
 
 #loading old words
 load_atomic_words(config.getWordsWithPinyinFileName())
-#print(atomic_words_list)
+#print(atomic_words_dict)
+
