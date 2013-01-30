@@ -169,7 +169,7 @@ def handleOneIndex(indexpath, subdir, indexname, fast):
             os.unlink(shmfilepath)
         else:
             handleOnePass(indexpath, workdir, i)
-            handleOnePass(indexpath, workdir, i)
+            pruneNgramTable(indexpath, workdir, i)
 
     #sign epoch
     utils.sign_epoch(indexstatus, 'Populate')
