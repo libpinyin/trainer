@@ -9,12 +9,11 @@ class MyConfig:
                            'EstimateEpoch': 1, \
                            'PruneEpoch': 1, \
                            'EvaluateEpoch': 1, \
-                           'PrepareEpoch': 2, \
-                           'PopulateEpoch': 3, \
-                           'PartialWordThresholdEpoch': 4, \
-                           'PartialWordEpoch': 5, \
-                           'NewWordEpoch': 6, \
-                           'MarkPinyinEpoch': 7, \
+                           'PrepareEpoch': 1, \
+                           'PopulateEpoch': 1, \
+                           'PartialWordEpoch': 1, \
+                           'NewWordEpoch': 1, \
+                           'MarkPinyinEpoch': 1, \
                            }
 
     def getEpochs(self):
