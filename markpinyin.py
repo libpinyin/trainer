@@ -26,7 +26,7 @@ merged_words_dict = {}
 
 
 def load_atomic_words(filename):
-    wordsfile = open(filename)
+    wordsfile = open(filename, "r")
     for oneline in wordsfile.readlines():
         oneline = oneline.rstrip(os.linesep)
 
@@ -45,7 +45,7 @@ def load_atomic_words(filename):
 
 
 def load_merged_words(filename):
-    wordsfile = open(filename)
+    wordsfile = open(filename, "r")
     for oneline in wordsfile.readlines():
         oneline = oneline.rstrip(os.linesep)
 
