@@ -12,7 +12,7 @@ default = 100
 
 words_dict = {}
 
-def load_recognized_word(filename):
+def load_recognized_words(filename):
     print(filename)
 
     words = set([])
@@ -80,7 +80,7 @@ def filter_recognized_words(filename):
 def save_merged_words(filename):
     print(filename)
 
-    wordfile = open(filename, "r")
+    wordfile = open(filename, "w")
     for word, pairs in merged_words_dict.items():
         pinyins = {}
         for pinyin, freq in pairs:
@@ -91,7 +91,7 @@ def save_merged_words(filename):
 
         freqsum = sum([ freq for pinyin, freq in pinyins.items() ])
 
-        for pinyin, freq in pairs.items():
+        for pinyin, freq in pinyins.items():
             freq = int(default * freq / freqsum)
 
             if freq < minimum:
@@ -99,7 +99,7 @@ def save_merged_words(filename):
 
             freq = str(freq)
 
-            oneline = '\t'.join(word, pinyin, freq)
+            oneline = '\t'.join((word, pinyin, freq))
             wordfile.writelines([oneline, os.linesep])
 
     wordfile.close()
