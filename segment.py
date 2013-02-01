@@ -29,17 +29,14 @@ def segmentOneText(infile, outfile, reportfile, fast):
 
     #begin processing
     if fast:
-        cmdline = '../utils/segment/spseg >"' + outfile + '"'
+        cmdline = ['../utils/segment/spseg', \
+                       '-o', outfile, infile]
     else:
-        cmdline = '../utils/segment/ngseg >"' + outfile + '"'
+        cmdline = ['../utils/segment/ngseg', \
+                       '-o', outfile, infile]
 
-    subprocess = Popen(cmdline, shell=True, stdin=PIPE, stderr=PIPE, \
+    subprocess = Popen(cmdline, shell=False, stderr=PIPE, \
                            close_fds=True)
-
-    with open(infile, 'rb') as f:
-        subprocess.stdin.writelines(f.readlines())
-    subprocess.stdin.close()
-    f.close()
 
     lines = subprocess.stderr.readlines()
     if lines:
