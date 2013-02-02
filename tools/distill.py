@@ -34,9 +34,9 @@ def add_words_dict(word, pinyin, freq):
 def load_phrase(filename):
     phrasefile = open(filename, "r")
 
-    for line in phrasefile.readlines():
-        line = line.rstrip(os.linesep)
-        (pinyin, word, token, freq) = line.split(None, 3)
+    for oneline in phrasefile.readlines():
+        oneline = oneline.rstrip(os.linesep)
+        (pinyin, word, token, freq) = oneline.split(None, 3)
         freq = int(freq)
         add_words_set(word)
         add_words_dict(word, pinyin, freq)
@@ -71,8 +71,8 @@ def save_words_dict(filename):
     wordsfile = open(filename, 'w')
     for (word, pinyin, freq) in oldwords_list:
         freq = str(freq)
-        line = "\t".join((word, pinyin, freq))
-        wordsfile.writelines([line, os.linesep])
+        oneline = "\t".join((word, pinyin, freq))
+        wordsfile.writelines([oneline, os.linesep])
     wordsfile.close()
 
 
