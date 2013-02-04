@@ -128,7 +128,7 @@ class MyConfig:
         return " "
 
     def getMaximumCombineNumber(self):
-        N = 5
+        N = 7
         assert N >= 2, 'at least bi-gram'
         return N
 
@@ -142,10 +142,10 @@ class MyConfig:
         return 9 # minimum word occurrence in n-gram table
 
     def getPartialWordThreshold(self):
-        return 0.10 # the first 10% in position
+        return 0.70 # the first 70% in position
 
     def getNewWordThreshold(self):
-        return 0.95 # the first 95% in position, subject verb object.
+        return 0.70 # the first 70% in position, subject verb object.
 
     def getMinimumEntropy(self):
         return 0.01
