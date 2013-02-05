@@ -1,10 +1,14 @@
 #!/usr/bin/python3
 import os
+from argparse import ArgumentParser
+
 
 #minimum duplicates in recognized dictionaries to be merged
 threshold = 3
 
 #minimum pinyin frequency
+#keep the un-merged word/pinyin/freq un-touched,
+#only affect the merged word/pinyin/freq tuples.
 minimum = 3
 
 #default pinyin total frequency
@@ -103,3 +107,25 @@ def save_merged_words(filename):
             wordfile.writelines([oneline, os.linesep])
 
     wordfile.close()
+
+
+if __name__ == "__main__":
+    parser = ArgumentParser(description='merge dictionaries.')
+    parser.add_argument('-o', '--output', action='store', \
+                            help='merged dictionary', \
+                            default='merged.table')
+    parser.add_argument('inputs', type=str, nargs='+', \
+                            help='dictionaries')
+
+
+    args = parser.parse_args()
+    print(args)
+    #loading
+    for filename in args.inputs:
+        load_recognized_words(filename)
+    #filtering
+    for filename in args.inputs:
+        filter_recognized_words(filename)
+    #saving merged dictionary
+    save_merged_words(args.output)
+    print('done')
