@@ -9,7 +9,8 @@ threshold = 3
 #minimum pinyin frequency
 #keep the un-merged word/pinyin/freq un-touched,
 #only affect the merged word/pinyin/freq tuples.
-minimum = 3
+#try to use 2 to maximize the phrases in merged table.
+minimum = 2
 
 #default pinyin total frequency
 default = 100
