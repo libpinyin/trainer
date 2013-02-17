@@ -60,7 +60,7 @@ def handleOneIndex(indexpath, subdir, indexname, fast):
     inMemoryFile = "model.db"
 
     modeldir = os.path.join(config.getModelDir(), subdir, indexname)
-    os.makedirs(modeldir, exist_ok=True)
+    os.path.exists(modeldir) or os.makedirs(modeldir)
 
 
     def cleanupInMemoryFile():

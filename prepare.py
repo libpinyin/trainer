@@ -27,7 +27,7 @@ N = config.getMaximumCombineNumber()
 
 #change cwd to the word recognizer directory
 words_dir = config.getWordRecognizerDir()
-os.makedirs(words_dir, exist_ok=True)
+os.path.exists(words_dir) or os.makedirs(words_dir)
 os.chdir(words_dir)
 #chdir done
 
@@ -71,7 +71,7 @@ def handleOneIndex(indexpath, subdir, indexname):
     #create directory
     onedir = config.getWordRecognizerDir() + os.sep + \
         subdir + os.sep + indexname
-    os.makedirs(onedir, exist_ok=True)
+    os.path.exists(onedir) or os.makedirs(onedir)
 
     #create sqlite databases
     createSqliteDatabases(onedir)

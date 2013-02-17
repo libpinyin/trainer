@@ -29,7 +29,8 @@ def iterateSubDirectory(oldroot, newroot, level):
     #Merge the index in oldroot
     if level <= 0:
         newindex = newroot + config.getIndexPostfix()
-        os.makedirs(os.path.dirname(newindex), exist_ok=True)
+        dirname = os.path.dirname(newindex)
+        os.path.exists(dirname) or os.makedirs(dirname)
         newindexfile = open(newindex, 'a')
         mergeSubIndex(newindexfile, oldroot)
         newindexfile.close()
