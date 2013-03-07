@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 import os
 from operator import itemgetter
+from argparse import ArgumentParser
 
 words_set = set([])
 words_dict = {}
@@ -44,20 +45,23 @@ def load_phrase(filename):
     phrasefile.close()
 
 
-load_phrase("gb_char.table")
-load_phrase("gbk_char.table")
-
-
-#sorting
-words_list = list(words_set)
-words_list.sort()
-
+words_list = []
 oldwords_list = []
-for key, value in words_dict.items():
-    (word, pinyin) = key
-    freq = value
-    oldwords_list.append((word, pinyin, freq))
-oldwords_list.sort(key=itemgetter(0))
+
+
+def sort_words():
+    #sorting
+    global words_list
+    words_list = list(words_set)
+    words_list.sort()
+
+    global oldwords_list
+    oldwords_list = []
+    for key, value in words_dict.items():
+        (word, pinyin) = key
+        freq = value
+        oldwords_list.append((word, pinyin, freq))
+    oldwords_list.sort(key=itemgetter(0))
 
 
 def save_words_list(filename):
@@ -77,5 +81,20 @@ def save_words_dict(filename):
 
 
 if __name__ == "__main__":
+    parser = ArgumentParser(description='distill dictionaries.')
+    parser.add_argument('inputs', type=str, nargs='*', \
+                            help='dictionaries', \
+                            default=['gb_char.table', 'gbk_char.table', \
+                                         'merged.table'])
+
+
+    args = parser.parse_args()
+    print(args)
+    #loading
+    for filename in args.inputs:
+        load_phrase(filename)
+
+    sort_words()
+
     save_words_list("words.txt")
     save_words_dict("oldwords.txt")
