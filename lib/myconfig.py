@@ -142,10 +142,10 @@ class MyConfig:
         return 9 # minimum word occurrence in n-gram table
 
     def getPartialWordThreshold(self):
-        return 0.60 # the first 60% in position
+        return 0.50 # the first 50% in position
 
     def getNewWordThreshold(self):
-        return 0.79 # the first 79% in position, subject verb object.
+        return 0.60 # the first 60% in position, subject verb object.
 
     def getMinimumEntropy(self):
         return 0.01
