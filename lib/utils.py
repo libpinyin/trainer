@@ -23,14 +23,12 @@ class EpochError(Exception):
 def read_file(infile):
     with open(infile, 'r') as f:
         data = ''.join(f.readlines())
-    f.close()
     return data
 
 
 def write_file(outfile, data):
     with open(outfile, 'w') as f:
         f.writelines([data])
-    f.close()
     return
 
 

@@ -43,7 +43,6 @@ def generateOneText(infile, modelfile, reportfile):
         print('found error report')
         with open(reportfile, 'ab') as f:
             f.writelines(lines)
-        f.close()
 
     (pid, status) = os.waitpid(subprocess.pid, 0)
     if status != 0:

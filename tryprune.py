@@ -41,7 +41,6 @@ def exportModel(modelfile, textmodel):
 
     with open(textmodel, 'wb') as f:
         f.writelines(subprocess.stdout.readlines())
-    f.close()
 
     (pid, status) = os.waitpid(subprocess.pid, 0)
     if status != 0:
@@ -59,7 +58,6 @@ def convertModel(kmm_model, inter_model):
 
     with open(inter_model, 'wb') as f:
         f.writelines(subprocess.stdout.readlines())
-    f.close()
 
     (pid, status) = os.waitpid(subprocess.pid, 0)
     if status != 0:
