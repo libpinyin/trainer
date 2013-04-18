@@ -14,6 +14,7 @@ class MyConfig:
                            'PartialWordEpoch': 1, \
                            'NewWordEpoch': 1, \
                            'MarkPinyinEpoch': 1, \
+                           'MergeSequenceEpoch': 1, \
                            }
 
     def getEpochs(self):
@@ -106,6 +107,15 @@ class MyConfig:
 
     def getTextPostfix(self):
         return '.text'
+
+    def getBackupPostfix(self):
+        return '.backup'
+
+    def getMergedPostfix(self):
+        return '.merged'
+
+    def getMergedReportPostfix(self):
+        return '.merged.report'
 
     def getFinalModelFileName(self):
         return 'interpolation2.text'

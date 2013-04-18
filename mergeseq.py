@@ -21,19 +21,19 @@ def handleError(error):
     sys.exit(error)
 
 
-def segmentOneText(infile, outfile, reportfile, fast):
+def mergeOneText(infile, outfile, reportfile):
     infilestatuspath = infile + config.getStatusPostfix()
     infilestatus = utils.load_status(infilestatuspath)
-    if utils.check_epoch(infilestatus, 'Segment'):
+    if not utils.check_epoch(infilestatus, 'Segment'):
+        raise utils.EpochError('Please segment first.\n')
+    if utils.check_epoch(infilestatus, 'MergeSequence'):
         return
 
+    infile = infile + config.getSegmentPostfix()
+
     #begin processing
-    if fast:
-        cmdline = ['../utils/segment/spseg', \
-                       '-o', outfile, infile]
-    else:
-        cmdline = ['../utils/segment/ngseg', \
-                       '-o', outfile, infile]
+    cmdline = ['../utils/segment/mergeseq', \
+                   '-o', outfile, infile]
 
     subprocess = Popen(cmdline, shell=False, stderr=PIPE, \
                            close_fds=True)
@@ -47,14 +47,16 @@ def segmentOneText(infile, outfile, reportfile, fast):
     os.waitpid(subprocess.pid, 0)
     #end processing
 
-    utils.sign_epoch(infilestatus, 'Segment')
+    utils.sign_epoch(infilestatus, 'MergeSequence')
     utils.store_status(infilestatuspath, infilestatus)
 
 
-def handleOneIndex(indexpath, fast):
+def handleOneIndex(indexpath):
     indexstatuspath = indexpath + config.getStatusPostfix()
     indexstatus = utils.load_status(indexstatuspath)
-    if utils.check_epoch(indexstatus, 'Segment'):
+    if not utils.check_epoch(indexstatus, 'Segment'):
+        raise utils.EpochError('Please segment first.\n')
+    if utils.check_epoch(indexstatus, 'MergeSequence'):
         return
 
     #begin processing
@@ -65,44 +67,41 @@ def handleOneIndex(indexpath, fast):
         (title, textpath) = oneline.split('#')
 
         infile = config.getTextDir() + textpath
-        outfile = config.getTextDir() + textpath + config.getSegmentPostfix()
+        outfile = config.getTextDir() + textpath + config.getMergedPostfix()
         reportfile = config.getTextDir() + textpath + \
-            config.getSegmentReportPostfix()
+            config.getMergedReportPostfix()
 
         print("Processing " + title + '#' + textpath)
-        segmentOneText(infile, outfile, reportfile, fast)
+        mergeOneText(infile, outfile, reportfile)
         print("Processed " + title + '#' + textpath)
 
     indexfile.close()
     #end processing
 
-    utils.sign_epoch(indexstatus, 'Segment')
+    utils.sign_epoch(indexstatus, 'MergeSequence')
     utils.store_status(indexstatuspath, indexstatus)
 
 
-def walkThroughIndex(path, fast):
+def walkThroughIndex(path):
     for root, dirs, files in os.walk(path, topdown=True, onerror=handleError):
         for onefile in files:
             filepath = os.path.join(root, onefile)
             if onefile.endswith(config.getIndexPostfix()):
-                handleOneIndex(filepath, fast)
+                handleOneIndex(filepath)
             elif onefile.endswith(config.getStatusPostfix()):
                 pass
             else:
                 print('Unexpected file:' + filepath)
 
-
 if __name__ == '__main__':
-    parser = ArgumentParser(description='Segment all raw corpus documents.')
+    parser = ArgumentParser(description='Merge all corpus segmented documents.')
     parser.add_argument('--indexdir', action='store', \
                             help='index directory', \
                             default=config.getTextIndexDir())
 
-    parser.add_argument('--fast', action='store_const', \
-                            help='Use spseg to speed up segment', \
-                            const=True, default=False)
-
     args = parser.parse_args()
     print(args)
-    walkThroughIndex(args.indexdir, args.fast)
+    walkThroughIndex(args.indexdir)
     print('done')
+
+
