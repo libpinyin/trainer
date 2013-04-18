@@ -21,8 +21,8 @@ os.chdir(libpinyin_sub_dir)
 def generateOneText(infile, modelfile, reportfile):
     infilestatuspath = infile + config.getStatusPostfix()
     infilestatus = utils.load_status(infilestatuspath)
-    if not utils.check_epoch(infilestatus, 'Segment'):
-        raise utils.EpochError('Please segment first.\n')
+    if not utils.check_epoch(infilestatus, 'MergeSequence'):
+        raise utils.EpochError('Please mergeseq first.\n')
     if utils.check_epoch(infilestatus, 'Generate'):
         return False
 
@@ -34,7 +34,7 @@ def generateOneText(infile, modelfile, reportfile):
                    str(config.getMaximumIncreaseRatesAllowed()), \
                    '--k-mixture-model-file', \
                    modelfile, infile + \
-                   config.getSegmentPostfix()]
+                   config.getMergedPostfix()]
     subprocess = Popen(cmdline, shell=False, stderr=PIPE, \
                            close_fds=True)
 
@@ -106,8 +106,8 @@ def handleOneIndex(indexpath, subdir, indexname, fast):
 
     indexstatuspath = indexpath + config.getStatusPostfix()
     indexstatus = utils.load_status(indexstatuspath)
-    if not utils.check_epoch(indexstatus, 'Segment'):
-        raise utils.EpochError('Please segment first.\n')
+    if not utils.check_epoch(indexstatus, 'MergeSequence'):
+        raise utils.EpochError('Please mergeseq first.\n')
     if utils.check_epoch(indexstatus, 'Generate'):
         return
 
@@ -135,7 +135,7 @@ def handleOneIndex(indexpath, subdir, indexname, fast):
         oneline = oneline.rstrip(os.linesep)
         (title, textpath) = oneline.split('#')
         infile = config.getTextDir() + textpath
-        infilesize = utils.get_file_length(infile + config.getSegmentPostfix())
+        infilesize = utils.get_file_length(infile + config.getMergedPostfix())
         if infilesize < config.getMinimumFileSize():
             print("Skipping " + title + '#' + textpath)
             continue
