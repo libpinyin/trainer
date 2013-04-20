@@ -114,7 +114,7 @@ if __name__ == "__main__":
     parser = ArgumentParser(description='merge dictionaries.')
     parser.add_argument('-o', '--output', action='store', \
                             help='merged dictionary', \
-                            default='merged.table')
+                            default='merged.txt')
     parser.add_argument('inputs', type=str, nargs='+', \
                             help='dictionaries')
 
