@@ -73,7 +73,7 @@ class MyConfig:
 
     #the trained corpus size of model candidates
     def getCandidateModelSize(self):
-        candidate_model_size = 30.0 * 1024 * 1024 * 3
+        candidate_model_size = 28.5 * 1000 * 1000 * 2
         return candidate_model_size
 
     def getModelPostfix(self):
