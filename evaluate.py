@@ -82,9 +82,9 @@ def estimateModel(reportfile):
     return avg_lambda
 
 
-def modifyCodeforLambda(lambdaparam):
+def modifyLambda(lambdaparam):
     #begin processing
-    cmdline = ['/usr/bin/make', 'rebuild', \
+    cmdline = ['/usr/bin/make', 'modify', \
                    'LAMBDA_PARAMETER=' + str(lambdaparam)]
     subprocess = Popen(cmdline, shell=False, close_fds=True)
     (pid, status) = os.waitpid(subprocess.pid, 0)
@@ -163,8 +163,8 @@ if __name__ == '__main__':
     cwdstatus['EvaluateAverageLambda'] = avg_lambda
     utils.store_status(cwdstatuspath, cwdstatus)
 
-    print('rebuilding')
-    modifyCodeforLambda(avg_lambda)
+    print('modifying lambda')
+    modifyLambda(avg_lambda)
 
     print('evaluating')
     reportfile = os.path.join(trydir, 'evaluate' + config.getReportPostfix())
