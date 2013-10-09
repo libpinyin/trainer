@@ -216,6 +216,9 @@ def doCombineWord(high_cur, low_cur, words):
     words_str = sep + prefix + sep + postfix + sep
     #print(words_str)
 
+    #if the to-be-merged sequence has several matched pairs,
+    #  then several sequences will be added to lower-gram.
+    #TODO: maybe consider equally divide the matched_freq.
     for item in matched_items:
         (matched_words_str, matched_freq) = item
         assert words_str in matched_words_str
