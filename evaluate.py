@@ -18,10 +18,9 @@ libpinyin_sub_dir = os.path.join(libpinyin_dir, 'data')
 os.chdir(libpinyin_sub_dir)
 #chdir done
 
-datafiles = ['gb_char.table',  'gbk_char.table', \
-                 config.getFinalModelFileName(), \
-                 config.getEvalsTextFileName(), \
-                 'deleted_bigram.db']
+datafiles = [config.getFinalModelFileName(), \
+             config.getEvalsTextFileName(), \
+             'deleted_bigram.db']
 
 
 def checkData():
