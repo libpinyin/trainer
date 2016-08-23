@@ -85,7 +85,7 @@ if __name__ == "__main__":
     parser.add_argument('inputs', type=str, nargs='*', \
                             help='dictionaries', \
                             default=['gb_char.table', 'gbk_char.table', \
-                                         'merged.table'])
+                                         'opengram.table', 'merged.table'])
 
 
     args = parser.parse_args()
