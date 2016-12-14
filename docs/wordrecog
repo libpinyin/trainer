@@ -1,0 +1,96 @@
+New Word Recognizer
+
+== 基于n-gram的新词识别算法
+
+== 术语定义
+1. Partial Word:
+  * 该词汇序列在Uni-gram出现过足够多次，达到P(W)的阈值;
+  * 该P(W)的定义为: 合并后的词的Uni-gram的概率;
+  * 该信息来自扫描Bi-gram表;
+2. New Word:
+  * 该词汇是Partial Word;
+  * 而且出现在Bi-gram中足够多的不同词汇后面(和前面)，达到熵的阈值;
+  * 熵的定义为:
+        假设该词为NW, NW 前边(和后边)的词汇依次为W_1, W_2, ..., W_n;
+	对应的Bi-gram的NW出现次数为NC, W_1的次数为C_1, W_2的次数为C_2, ..., W_N的次数为C_n;
+        则该熵为 H(NW):
+          NC = \sum_{i=1}^n {C_i}
+          p(w_i) = C_i / NC
+          H(NW) = -\sum_{i=1}^n {p(w_i) \log_b p(w_i)}
+  * 该信息来自扫描Bi-gram表;
+
+== 阈值的选取
+1. 阈值仅仅从词汇的P(W)和H(NW)值中选取, 既不考虑单字的概率;
+2. P(W)的阈值为P(W)的值排列在最后10%位置的已知词汇;
+3. H(NW)的阈值为H(NW)的值排列在最后10%位置的已知词汇;
+  * 分别算出NW的前边和后边的阈值，对前边和后边的H(NW)分别处理;
+
+== 训练过程
+
+== 数据集
+1. 数据集A用来发现Partial Word;
+2. 将处理完毕的数据集A称之为数据集B;
+3. 数据集B用来发现New Word;
+
+== 训练过程
+1. 确定P(W)和H(NW)的阈值;
+2. 反复扫描数据集A来发现Partial Word, 将其加入数据集A的Partial Word List, 基于新词重新生成数据集A;(扫描2-gram.db的ngram表)
+   Note: 在重新生成数据集时, 扫描所有的n-gram信息，将对应的序列合并，并将新的序列放入对应的低阶n-gram表中;
+3. 重复上面过程直到没有新的Partial Word出现;
+
+4. 扫描数据集A的Partial Word List来发现New Word, 将其加入数据集B的New Word List;
+   Note: 由于New Word已经是Partial Word, 没有必要将New Word放入Partial Word List, 应该已经在里边了;
+
+Note: Partial Word List和New Word List除了保存识别出来的Word外，还保存了合并前的原始序列; 应该可以保存, 同一个词汇的多个不同序列。
+
+== 原始设想
+1. 最早考虑过用全文本来存储数据，但是python速度比较慢，可能花费时间过长;
+2. 根据以上需求，应该仅仅需要存储n-gram信息即可，直到足够的N, 比如32;
+  Uni-gram Example: Word Freq;
+  Bi-gram Example:  Word1 Word2 Freq;
+   ...
+  N-gram Example: Word1 Word2 ... WordN Freq;
+
+== 改进设计
+1. 将纯文本格式改为使用sqlite来存储;
+2. 使用 python + sqlite来实现;
+
+== Database Scheme
+1. 每一个 n-gram 都有一个独立的 sqlite database 文件;
+
+== Database DDL
+1. 所有的 n-gram scheme 都如下:
+  * Create Table ngram (
+      words TEXT NOT NULL,
+      freq INTEGER NOT NULL
+    );
+2. 对于bi-gram, 有一张特殊的表: (转换自2-gram.db 的 ngram 表)
+  * Create Table bigram (
+      prefix TEXT NOT NULL,
+      postfix TEXT NOT NULL,
+      freq INTEGER NOT NULL
+     );
+
+== Database DML
+1. 相关的SQL 语句如下:
+  1. Partial Word 条件, 在 bi-gram 的 sqlite database 中查询:
+     * SELECT words FROM ngram WHERE freq > threshold;
+  2. New Word 条件:
+     * Get all New Word candidates;
+       * Copying the Partial Words List from 数据集A;
+     * Compute the Information Entroy for each New Word candidate;
+       * SELECT prefix, freq FROM bigram where postfix == "$candidate";
+       * SELECT postfix, freq FROM bigram where prefix == "$candidate";
+     * New Word found, if both:
+         before entroy > before threshold;
+         and after entroy >  after threshold;
+  3. 当 New Partial Word 被发现后: (转换高阶的n-gram为sqlite fts3 table)
+      * 在高阶的 n-gram 中，合并包括 New Partial Word 的新词序列；
+       * SELECT words, freq from ngram_fts WHERE words MATCH '" $prefix $postfix "';
+            * 根据返回的 words 内容，分情况处理;
+      * 将合并后的词汇序列放入到低阶的 n-gram 的 sqlite database 中;
+
+== Note:
+训练过程中，如果两个序列可以组成同一个词，在识别出其中一个序列时，仅合并这一个序列，因为另一个序列可能不符合形成Partial Word的条件; 如果两个序列都被识别为Partial Word, 则合并该Partial Word; ...
+
+另外, 我可以认为不同的两个序列，由于分词不同，代表着不同的词汇含义, 可以认为是两个不同的词汇.

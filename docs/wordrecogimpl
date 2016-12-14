@@ -1,0 +1,117 @@
+Word Recognizer Implementation
+
+
+== New Tools ==
+* prepary.py - prepare the initial sqlite database;
+* populate.py - convert the corpus file to n-gram sqlite format;
+* partialword.py - recognize partial words;
+* newword.py - filter out the new words;
+* markpinyin.py - mark pinyin according to the n-gram sequence;
+
+
+== Data Flow ==
+prepare.py => populate.py => threshold.py => partialword.py => newword.py;
+
+== Implementation ==
+
+=== populate.py ===
+word history = [ W1, W2, ... , Wn ]
+store word history and freq into ngram table.
+
+=== populate.py ===
+multi-pass processing (1...N)
+steps:
+    for each index file:
+        for each pass for ngram table:
+            for each word history from corpus file:
+            UPDATE ngram SET freq = freq + 1 WHERE words = "word history";
+            OR INSERT INTO ngram VALUES("word history", 1);
+
+
+=== partialword.py ===
+get partial word threshold pass:
+   for each word from libpinyin dictionaries:
+       get the word uni-gram frequency from ngram table in 1-gram.db;
+       store the word and freq pair into an array;
+   sort the word array by freq;
+   get the threshold from the freq of the last 10% word in position;
+
+get partial words pass:
+   words = set([])
+
+   while True:
+       get all partial word candidates from ngram of 2-gram.db;
+       skip all existing or already merged words;
+       if no new partial word candidates,
+           break;
+       save all partial word candidates to "partialword.txt" file;
+
+       for each index file:
+           for each pass for ngram table from N to 1:
+               convert ngram table to sqlite fts table;
+               do combine merged words from higher-gram to lower-gram;
+                   for new each partial word:
+                   select matched word sequences from ngram fts table
+                   update or insert merged word sequences into lower-gram;
+                   delete origin word sequences (before merged) from higher-gram;
+
+       remember all partial word candidates as merged words;
+
+
+=== newword.py ===
+get new word prefix entropy threshold pass:
+    for each word from libpinyin dictionaries:
+        get the prefix information entropy of the word from bigram table;
+        store the word and entropy pair into an array;
+    sort the word array by entropy;
+    get the prefix entropy threshold from the entropy of the last 50% word in position;
+
+get new word postfix entropy threshold pass:
+    for each word from libpinyin dictionaries:
+        get the postfix information entropy of the word from bigram table;
+        store the word and entropy pair into an array;
+    sort the word array by entropy;
+    get the postfix entropy threshold from the entropy of the last 50% word in position;
+
+filter out new words pass:
+    for each new word candidates (partial words):
+        compute the prefix information entropy of the word from bigram table;
+        if entropy < threshold:
+            continue
+        compute the postfix information entropy of the word from bigram table;
+        if entropy < threshold:
+            continue
+        save the new word candidate as new word; (newword.txt)
+
+
+=== markpinyin.py ===
+mark pinyin according to the merged word sequence;
+
+atomic word is from libpinyin dictionaries.
+merged word is from new words. (in partialword.txt)
+
+merge pinyin helper:
+    merge all pairs with the same pinyin, and sum freq;
+
+steps:
+    for each new word:
+        if an atomic word:
+            return all pinyin and freq pairs;
+        if an merge word sequence:
+            for each merged pair:
+                for each prefix:
+                    for each postfix:
+                        pinyin = prefix pinyin + "'" + postfix pinyin;
+                        freq = default * merged poss * prefix poss * postfix poss
+            return all pinyin and freq pairs;
+
+==== notes ====
+oldwords.txt: phrase ␣ pinyin without tone ␣ pinyin freq
+partialwords.txt: prefix ␣ postfix ␣ phrase ␣ merge freq
+newwords.txt: phrase
+
+for new words, recursive divide pinyin freq into atomic phrases according to merge freq of partialwords.txt and pinyin freq of oldwords.txt;
+    if atomic phrase in old words,
+        then divide pinyin freq by old pinyin freq;
+    combine the same pinyin and phrase into one, freq = sum freq/all freq;
+    total pinyin freq is default to 100;
