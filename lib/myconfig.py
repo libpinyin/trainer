@@ -15,6 +15,7 @@ class MyConfig:
                            'NewWordEpoch': 1, \
                            'MarkPinyinEpoch': 1, \
                            'MergeSequenceEpoch': 1, \
+                           'PunctuationEpoch': 1, \
                            }
 
     def getEpochs(self):
@@ -186,3 +187,31 @@ class MyConfig:
 
     def getMinimumPinyinFrequency(self):
         return 3
+
+    '''
+    Generate Punctuation Configuration
+    '''
+
+    def getGeneratePunctuationDir(self):
+        return self.m_trainer_dir + os.sep + 'genpunct'
+
+    def getPunctuationPerIndexFileName(self):
+        return 'punctuation-index.text'
+
+    def getPunctuationPruneIndexFileName(self):
+        return 'punctuation-prune.text'
+
+    def getPunctuationAllIndexFileName(self):
+        return 'punctuation-all.text'
+
+    def getPunctuationPruneAllIndexFileName(self):
+        return 'punctuation-all-prune.text'
+
+    def getPunctuationTextFileName(self):
+        return 'puncts.table'
+
+    def getPunctuationPerIndexPruneThreshold(self):
+        return 5 * 100
+
+    def getPunctuationAllIndexPruneThreshold(self):
+        return self.getPunctuationPerIndexPruneThreshold() * 20
